@@ -1,0 +1,114 @@
+{
+  "project_info": {
+    "project_number": "739395078190",
+    "firebase_url": "https://reselvation-001-default-rtdb.firebaseio.com",
+    "project_id": "reselvation-001",
+    "storage_bucket": "reselvation-001.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:739395078190:android:1d1564f6f452ebc24ab7bf",
+        "android_client_info": {
+          "package_name": "com.kyoungmin.firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "739395078190-p28r255bin2cm2bvmrr9j6ctjfl3tk8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBROj0-vvoKsEFM1w-xi6MHW4Z_91JZv1w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "739395078190-5lisaanpgc430i6p4pcu3h0ptofi0n8h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:739395078190:android:f96d26b485fdefb34ab7bf",
+        "android_client_info": {
+          "package_name": "com.kyoungmin.member"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "739395078190-3q916u5lfl8i5alchvl5lgvh7qolp7pd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kyoungmin.member",
+            "certificate_hash": "09e784a04cb1c9678836dec82628265a5988b6df"
+          }
+        },
+        {
+          "client_id": "739395078190-p28r255bin2cm2bvmrr9j6ctjfl3tk8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBROj0-vvoKsEFM1w-xi6MHW4Z_91JZv1w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "739395078190-5lisaanpgc430i6p4pcu3h0ptofi0n8h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:739395078190:android:71401b01850bb5cd4ab7bf",
+        "android_client_info": {
+          "package_name": "com.kyoungmin.reselvation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "739395078190-ptdmnlvgamgrm05ghrrt2nuecsup9hie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kyoungmin.reselvation",
+            "certificate_hash": "09e784a04cb1c9678836dec82628265a5988b6df"
+          }
+        },
+        {
+          "client_id": "739395078190-p28r255bin2cm2bvmrr9j6ctjfl3tk8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBROj0-vvoKsEFM1w-xi6MHW4Z_91JZv1w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "739395078190-5lisaanpgc430i6p4pcu3h0ptofi0n8h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
