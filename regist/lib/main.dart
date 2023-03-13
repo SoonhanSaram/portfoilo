@@ -1,12 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:regist/calendar.dart';
 import 'package:regist/dto/reselvation_info.dart';
+import 'package:regist/membership_regist.dart';
 
+const String title = "Pick&Go";
+const String pageTitle = "로그인 페이지";
+const String loginButtonTitle = "이메일 로그인";
+const String joinButtonTitle = "이메일 회원가입";
+const String imageButtonTitle = "구글 로그인";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Future.delayed(const Duration(seconds: 3));
-
+  await Firebase.initializeApp();
   runApp(const App());
 }
 
@@ -16,7 +24,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Member",
+      title: title,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
       home: const HomePage(),
     );
@@ -40,6 +48,10 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
 
 class _HomePageState extends State<HomePage> {
   GoogleSignInAccount? _currentUser;
+
+  final String _email = "";
+  final String _password = "";
+
   late ReselInfo reselInfo = ReselInfo(
     user: '',
     date: '',
@@ -49,6 +61,29 @@ class _HomePageState extends State<HomePage> {
     number: '',
     pay: '',
   );
+
+  Future<void> _login() async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      );
+    } on FirebaseAuthException catch (e) {
+      String message = "";
+      if (e.code == "user-not-found") {
+        message = "가입되지 않은 이메일 입니다";
+      } else if (e.code == "wrong-password") {
+        message = "잘못된 비밀번호 입니다";
+      } else {
+        message = "알 수 없는 에러";
+      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+        message,
+        style: const TextStyle(color: Colors.white),
+      )));
+    }
+  }
 
   @override
   void initState() {
@@ -72,7 +107,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Member"),
+        title: const Text(title),
       ),
       body: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
@@ -83,98 +118,101 @@ class _HomePageState extends State<HomePage> {
 
   _buildBody() {
     final GoogleSignInAccount? user = _currentUser;
-
     if (user != null) {
       return RegisterScreen(
         reselInfo: reselInfo,
       );
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          const Text(
-            "로그인",
-            style: TextStyle(
-                fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
-          ),
-          const SizedBox(
-            height: 250,
-          ),
-          loginButton(),
-          const SizedBox(
-            height: 20,
-          ),
-
-          /**
-           * Flexible
-           * 내부에 있는 widget 이 화면을 벗어나려고 할 때,
-           * fit 속성을 Flexible.tight 로 설정하면
-           * 화면 범위내에서 화면에 남은 영역만 차지하도록
-           * 내부 화면 범위를 제한
-           */
-          const Flexible(
-            fit: FlexFit.tight,
-            child: SizedBox(
-              height: 100,
+      return Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            const Flexible(
+              fit: FlexFit.loose,
+              flex: 2,
+              child: Text(
+                pageTitle,
+                style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue),
+              ),
             ),
-          )
-        ],
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 4,
+              child: Column(
+                children: [
+                  inputBox(
+                      labelText: "이메일을 입력해주세요",
+                      keyboardType: TextInputType.emailAddress,
+                      stateValue: _email),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  inputBox(
+                      labelText: "비밀번호를 입력해주세요",
+                      obscureText: true,
+                      stateValue: _password,
+                      keyboardType: TextInputType.text),
+                  TextButton(
+                      onPressed: () {
+                        _login();
+                      },
+                      child: const Text(
+                        loginButtonTitle,
+                        style: TextStyle(fontSize: 24),
+                      )),
+                ],
+              ),
+            ),
+
+            /**
+             * Flexible
+             * 내부에 있는 widget 이 화면을 벗어나려고 할 때,
+             * fit 속성을 Flexible.tight 로 설정하면
+             * 화면 범위내에서 화면에 남은 영역만 차지하도록
+             * 내부 화면 범위를 제한
+             */
+            Flexible(
+                flex: 2,
+                fit: FlexFit.loose,
+                child: Column(
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const EmailRegist()));
+                        },
+                        child: const Text(joinButtonTitle)),
+                    loginButton(),
+                  ],
+                )),
+          ],
+        ),
       );
     }
   }
 
-  Form loginForm() {
-    return Form(
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            const Image(
-              width: 200,
-              height: 150,
-              image: AssetImage("images/user.png"),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            inputBox(
-                keyboardType: TextInputType.emailAddress,
-                errorMsg: "이메일을 입력해주세요",
-                onChanged: (value) {},
-                labelText: "이메일"),
-            const SizedBox(
-              height: 20,
-            ),
-            inputBox(
-                keyboardType: TextInputType.visiblePassword,
-                errorMsg: "비밀번호를 입력해주세요",
-                onChanged: (value) {},
-                labelText: "비밀번호",
-                obscureText: true)
-          ],
-        ),
-      ),
-    );
-  }
-
   TextFormField inputBox(
-      {keyboardType = TextInputType.text,
-      String errorMsg = "값을 입력",
-      String labelText = "값을 입력",
+      {String labelText = "Email을 입력해주세요",
       bool obscureText = false,
-      Function(dynamic value)? onChanged}) {
+      String stateValue = "",
+      TextInputType keyboardType = TextInputType.emailAddress}) {
     return TextFormField(
-      onChanged: onChanged,
       keyboardType: keyboardType,
-      obscureText: obscureText,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return "이메일을 입력하세요";
-        }
-        return errorMsg;
+      onChanged: (value) {
+        setState(() {
+          stateValue = value;
+        });
       },
+      obscureText: obscureText,
       decoration: InputDecoration(
-          border: const OutlineInputBorder(), labelText: labelText),
+          labelText: labelText,
+          labelStyle:
+              const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -206,7 +244,7 @@ class _HomePageState extends State<HomePage> {
             child: const Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
-                "구글로그인",
+                imageButtonTitle,
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -285,6 +323,4 @@ class RegisterScreen extends StatelessWidget {
       ),
     );
   }
-
-  void _registerUser() {}
 }
