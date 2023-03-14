@@ -11,87 +11,39 @@ const String pageTitle = "로그인 페이지";
 const String loginButtonTitle = "이메일 로그인";
 const String joinButtonTitle = "이메일 회원가입";
 const String imageButtonTitle = "구글 로그인";
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Future.delayed(const Duration(seconds: 3));
   await Firebase.initializeApp();
-  runApp(const App());
+  runApp(App());
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
-
+  App({super.key});
+  final LoginViewModel _loginViewModel = LoginViewModel();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: StaticViewModel.title,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
-      home: const HomePage(),
+      home: HomePage(
+        loginViewModel: _loginViewModel,
+      ),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key, required this.loginViewModel});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final LoginViewModel loginViewModel = LoginViewModel();
-  final GoogleSignIn _googleSignIn = loginViewModel.googleSignIn;
-
-  GoogleSignInAccount? _currentUser;
-
-  final String _email = "";
-  final String _password = "";
-
-  late ReselInfo reselInfo = ReselInfo(user: "");
-
-  Future<void> _login() async {
-    try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _email,
-        password: _password,
-      );
-    } on FirebaseAuthException catch (e) {
-      String message = "";
-      if (e.code == "user-not-found") {
-        message = "가입되지 않은 이메일 입니다";
-      } else if (e.code == "wrong-password") {
-        message = "잘못된 비밀번호 입니다";
-      } else {
-        message = "알 수 없는 에러";
-      }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-        message,
-        style: const TextStyle(color: Colors.white),
-      )));
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    /**
-     * google login 이 되면 google 로부터 event가 전달되고
-     * event를 기다리다가 user 정보가 오면 _currentUser 에
-     * GoogleSignInAccount 타입의 google login 정보를 저장
-     */
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
-      setState(() {
-        _currentUser = account;
-        reselInfo.user = account!.displayName ?? "";
-      });
-    }); // end SignIn
-
-    _googleSignIn.signInSilently();
-  }
+  final LoginViewModel loginViewModel;
 
   @override
   Widget build(BuildContext context) {
+    final GoogleSignInAccount? _currentUser = loginViewModel.user;
+    final ReselInfo? _reselInfo = loginViewModel.reselInfo;
+    final GoogleSignIn _googleSignIn = loginViewModel.googleSignIn;
     return Scaffold(
       appBar: AppBar(
         title: const Text(StaticViewModel.title),
@@ -101,145 +53,125 @@ class _HomePageState extends State<HomePage> {
         child: _buildBody(),
       ),
     );
-  } // end build
+  }
+}
 
-  _buildBody() {
-    final GoogleSignInAccount? user = _currentUser;
-    if (user != null) {
-      return RegisterScreen(
-        reselInfo: reselInfo,
-      );
-    } else {
-      return Expanded(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            const Flexible(
-              fit: FlexFit.loose,
-              flex: 2,
-              child: Text(
-                StaticViewModel.pageTitle,
-                style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue),
-              ),
+_buildBody() {
+  final GoogleSignInAccount? user = widget._currentUser;
+  if (user != null) {
+    return RegisterScreen(
+      reselInfo: _reselInfo,
+    );
+  } else {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          const Flexible(
+            fit: FlexFit.loose,
+            flex: 2,
+            child: Text(
+              StaticViewModel.pageTitle,
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
             ),
-            Flexible(
-              fit: FlexFit.tight,
-              flex: 4,
-              child: Column(
-                children: [
-                  inputBox(
-                      labelText: "이메일을 입력해주세요",
-                      keyboardType: TextInputType.emailAddress,
-                      stateValue: _email),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  inputBox(
-                      labelText: "비밀번호를 입력해주세요",
-                      obscureText: true,
-                      stateValue: _password,
-                      keyboardType: TextInputType.text),
-                  TextButton(
-                      onPressed: () {
-                        _login();
-                      },
-                      child: const Text(
-                        StaticViewModel.loginButtonTitle,
-                        style: TextStyle(fontSize: 24),
-                      )),
-                ],
-              ),
+          ),
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 4,
+            child: Column(
+              children: [
+                inputBox(labelText: "이메일을 입력해주세요", keyboardType: TextInputType.emailAddress, stateValue: _email),
+                const SizedBox(
+                  height: 20,
+                ),
+                inputBox(labelText: "비밀번호를 입력해주세요", obscureText: true, stateValue: _password, keyboardType: TextInputType.text),
+                TextButton(
+                    onPressed: () {
+                      _login();
+                    },
+                    child: const Text(
+                      StaticViewModel.loginButtonTitle,
+                      style: TextStyle(fontSize: 24),
+                    )),
+              ],
             ),
+          ),
 
-            /**
+          /**
              * Flexible
              * 내부에 있는 widget 이 화면을 벗어나려고 할 때,
              * fit 속성을 Flexible.tight 로 설정하면
              * 화면 범위내에서 화면에 남은 영역만 차지하도록
              * 내부 화면 범위를 제한
              */
-            Flexible(
-                flex: 2,
-                fit: FlexFit.loose,
-                child: Column(
-                  children: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const EmailRegist()));
-                        },
-                        child: const Text(StaticViewModel.joinButtonTitle)),
-                    loginButton(),
-                  ],
-                )),
-          ],
-        ),
-      );
-    }
-  }
-
-  TextFormField inputBox(
-      {String labelText = "Email을 입력해주세요",
-      bool obscureText = false,
-      String stateValue = "",
-      TextInputType keyboardType = TextInputType.emailAddress}) {
-    return TextFormField(
-      keyboardType: keyboardType,
-      onChanged: (value) {
-        setState(() {
-          stateValue = value;
-        });
-      },
-      obscureText: obscureText,
-      decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle:
-              const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-    );
-  }
-
-  GestureDetector loginButton() {
-    return GestureDetector(
-      onTap: () async {
-        try {
-          await _googleSignIn.signIn();
-        } catch (e) {
-          print(e);
-        }
-      },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color(0xFF4285F4),
-                ),
-              ),
-              width: 35,
-              height: 35,
-              child: Image.asset(
-                "images/btn_google.png",
+          Flexible(
+              flex: 2,
+              fit: FlexFit.loose,
+              child: Column(
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const EmailRegist()));
+                      },
+                      child: const Text(StaticViewModel.joinButtonTitle)),
+                  loginButton(),
+                ],
               )),
-          Container(
-            color: const Color(0xFF4285F4),
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                StaticViewModel.imageButtonTitle,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          )
         ],
       ),
     );
   }
+}
+
+TextFormField inputBox({String labelText = "Email을 입력해주세요", bool obscureText = false, String stateValue = "", TextInputType keyboardType = TextInputType.emailAddress}) {
+  return TextFormField(
+    keyboardType: keyboardType,
+    onChanged: (value) {
+      setState(() {
+        stateValue = value;
+      });
+    },
+    obscureText: obscureText,
+    decoration: InputDecoration(labelText: labelText, labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+  );
+}
+
+GestureDetector loginButton() {
+  return GestureDetector(
+    onTap: () async {
+      try {
+        await _googleSignIn.signIn();
+      } catch (e) {
+        print(e);
+      }
+    },
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFF4285F4),
+              ),
+            ),
+            width: 35,
+            height: 35,
+            child: Image.asset(
+              "images/btn_google.png",
+            )),
+        Container(
+          color: const Color(0xFF4285F4),
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              StaticViewModel.imageButtonTitle,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        )
+      ],
+    ),
+  );
 }
 
 Center iconButton() {
@@ -295,8 +227,7 @@ class RegisterScreen extends StatelessWidget {
 
   ElevatedButton registButton(context) {
     return ElevatedButton(
-      style: const ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll(Colors.white)),
+      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.white)),
       onPressed: () {
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {
