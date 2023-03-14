@@ -5,15 +5,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:regist/calendar.dart';
 import 'package:regist/dto/reselvation_info.dart';
 import 'package:regist/membership_regist.dart';
+import 'package:regist/viewmodel/user_view_model.dart';
 
-const String title = "Pick&Go";
 const String pageTitle = "로그인 페이지";
 const String loginButtonTitle = "이메일 로그인";
 const String joinButtonTitle = "이메일 회원가입";
 const String imageButtonTitle = "구글 로그인";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Future.delayed(const Duration(seconds: 3));
+  // await Future.delayed(const Duration(seconds: 3));
   await Firebase.initializeApp();
   runApp(const App());
 }
@@ -24,7 +24,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: title,
+      title: StaticViewModel.title,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
       home: const HomePage(),
     );
@@ -38,29 +38,16 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// google 로그인을 수행하기 위한 초기화 함수
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: [
-    'email',
-    'https://www.googleapis.com/auth/contacts.readonly',
-  ],
-);
-
 class _HomePageState extends State<HomePage> {
+  final LoginViewModel loginViewModel = LoginViewModel();
+  final GoogleSignIn _googleSignIn = loginViewModel.googleSignIn;
+
   GoogleSignInAccount? _currentUser;
 
   final String _email = "";
   final String _password = "";
 
-  late ReselInfo reselInfo = ReselInfo(
-    user: '',
-    date: '',
-    from: '',
-    destination: '',
-    transfer: '',
-    number: '',
-    pay: '',
-  );
+  late ReselInfo reselInfo = ReselInfo(user: "");
 
   Future<void> _login() async {
     try {
@@ -107,7 +94,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(title),
+        title: const Text(StaticViewModel.title),
       ),
       body: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
@@ -131,7 +118,7 @@ class _HomePageState extends State<HomePage> {
               fit: FlexFit.loose,
               flex: 2,
               child: Text(
-                pageTitle,
+                StaticViewModel.pageTitle,
                 style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w600,
@@ -160,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         _login();
                       },
                       child: const Text(
-                        loginButtonTitle,
+                        StaticViewModel.loginButtonTitle,
                         style: TextStyle(fontSize: 24),
                       )),
                 ],
@@ -186,7 +173,7 @@ class _HomePageState extends State<HomePage> {
                               MaterialPageRoute(
                                   builder: (context) => const EmailRegist()));
                         },
-                        child: const Text(joinButtonTitle)),
+                        child: const Text(StaticViewModel.joinButtonTitle)),
                     loginButton(),
                   ],
                 )),
@@ -244,7 +231,7 @@ class _HomePageState extends State<HomePage> {
             child: const Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
-                imageButtonTitle,
+                StaticViewModel.imageButtonTitle,
                 style: TextStyle(color: Colors.white),
               ),
             ),
