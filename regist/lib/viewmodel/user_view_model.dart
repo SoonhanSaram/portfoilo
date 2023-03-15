@@ -10,16 +10,16 @@ import 'package:regist/dto/reselvation_info.dart';
  */
 
 class StaticViewModel with ChangeNotifier {
+  static const String statePassword = "password";
   static const String title = "Pick&Go";
   static const String pageTitle = "로그인 페이지";
   static const String loginButtonTitle = "이메일 로그인";
   static const String joinButtonTitle = "이메일 회원가입";
   static const String imageButtonTitle = "구글 로그인";
   static const String passwordTextField = "비밀번호를 입력해주세요";
-
+  static const String emailTextField = "이메일을 입력해주세요";
   static const String googleScopeEmail = "email";
-  static const String googleScopeAddr =
-      "https://www.googleapis.com/auth/contacts.readonly";
+  static const String googleScopeAddr = "https://www.googleapis.com/auth/contacts.readonly";
 }
 
 class LoginViewModel with ChangeNotifier {
@@ -27,6 +27,7 @@ class LoginViewModel with ChangeNotifier {
   String password = "";
 
   GoogleSignInAccount? _currentUser;
+
   late ReselInfo reselInfo = ReselInfo(user: "");
 
   late final GoogleSignInAccount? user = _currentUser;
@@ -39,12 +40,18 @@ class LoginViewModel with ChangeNotifier {
     ],
   );
 
-  void changeUpdateValue(String stateValue, String value) {
-    stateValue = value;
+  void changeUpdateValue(String fieldName, String value) {
+    print(fieldName);
+    if (fieldName == "email") {
+      email = value;
+    } else if (fieldName == "password") {
+      password = value;
+    }
+    print("$email, $password");
     notifyListeners();
   }
 
-  loginUser() {
+  void loginUser() {
     /**
      * google login 이 되면 google 로부터 event가 전달되고
      * event를 기다리다가 user 정보가 오면 _currentUser 에
@@ -61,11 +68,13 @@ class LoginViewModel with ChangeNotifier {
   }
 
   Future<void> login(BuildContext context) async {
+    print(email + password);
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
       String message = "";
       if (e.code == "user-not-found") {
@@ -83,6 +92,7 @@ class LoginViewModel with ChangeNotifier {
           ),
         ),
       );
+      notifyListeners();
     }
   }
 }

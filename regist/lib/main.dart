@@ -35,9 +35,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoogleSignInAccount? user = loginViewModel.user;
-    final ReselInfo reselInfo = loginViewModel.reselInfo;
-    final GoogleSignIn googleSignIn = loginViewModel.googleSignIn;
     return Scaffold(
       appBar: AppBar(
         title: const Text(StaticViewModel.title),
@@ -68,10 +65,7 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
             flex: 2,
             child: Text(
               StaticViewModel.pageTitle,
-              style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue),
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
             ),
           ),
           Flexible(
@@ -80,11 +74,14 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
             child: Column(
               children: [
                 inputBox(
+                    labelText: StaticViewModel.emailTextField,
                     keyboardType: TextInputType.emailAddress,
                     stateValue: loginViewModel.email,
                     onChange: (value) => {
                           loginViewModel.changeUpdateValue(
-                              loginViewModel.email, value)
+                            StaticViewModel.googleScopeEmail,
+                            value,
+                          )
                         }),
                 const SizedBox(
                   height: 20,
@@ -96,11 +93,13 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
                     keyboardType: TextInputType.text,
                     onChange: (value) => {
                           loginViewModel.changeUpdateValue(
-                              loginViewModel.password, value)
+                            StaticViewModel.statePassword,
+                            value,
+                          )
                         }),
                 TextButton(
-                    onPressed: () {
-                      loginViewModel.login;
+                    onPressed: () async {
+                      await loginViewModel.login(context);
                     },
                     child: const Text(
                       StaticViewModel.loginButtonTitle,
@@ -124,13 +123,10 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
                 children: [
                   TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const EmailRegist()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const EmailRegist()));
                       },
                       child: const Text(StaticViewModel.joinButtonTitle)),
-                  loginButton(),
+                  loginButton(googleSignIn),
                 ],
               )),
         ],
@@ -140,7 +136,7 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
 }
 
 TextFormField inputBox({
-  String labelText = "Email을 입력해주세요",
+  String labelText = "",
   bool obscureText = false,
   String stateValue = "",
   TextInputType keyboardType = TextInputType.emailAddress,
@@ -150,17 +146,15 @@ TextFormField inputBox({
     keyboardType: keyboardType,
     onChanged: onChange,
     obscureText: obscureText,
-    decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    decoration: InputDecoration(labelText: labelText, labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 }
 
-GestureDetector loginButton() {
+GestureDetector loginButton(GoogleSignIn googleSignIn) {
   return GestureDetector(
     onTap: () async {
       try {
-        // await _googleSignIn.signIn();
+        await googleSignIn.signIn();
       } catch (e) {
         print(e);
       }
@@ -247,8 +241,7 @@ class RegisterScreen extends StatelessWidget {
 
   ElevatedButton registButton(context) {
     return ElevatedButton(
-      style: const ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll(Colors.white)),
+      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.white)),
       onPressed: () {
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {

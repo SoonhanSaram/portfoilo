@@ -46,6 +46,8 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   firebase_core: ^2.7.1
   firebase_auth: ^4.2.2
+  sqflite: ^2.2.6
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:

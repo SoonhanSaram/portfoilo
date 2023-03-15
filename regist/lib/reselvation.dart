@@ -14,7 +14,7 @@ class _reselvationState extends State<reselvation> {
   void initState() {
     super.initState();
     reselInfo = widget.reselInfo;
-    _dateController.text = reselInfo.date;
+    _dateController.text = reselInfo.sdate;
     _departureController.text = reselInfo.from;
     _destinationController.text = reselInfo.destination;
 
@@ -112,12 +112,11 @@ class _reselvationState extends State<reselvation> {
                   icon: const Icon(Icons.car_rental),
                   onChanged: (String? value) {
                     setState(() {
-                      reselInfo.transfer = value.toString();
+                      // reselInfo.transfer = value.toString();
                       _dropValue = value;
                     });
                   },
-                  items: <String>['승용차', '승합차', '리무진']
-                      .map<DropdownMenuItem<String>>((String value) {
+                  items: <String>['승용차', '승합차', '리무진'].map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -128,8 +127,8 @@ class _reselvationState extends State<reselvation> {
             ),
             TextButton(
               onPressed: () {
-                reselInfo.time = _timeController.text;
-                reselInfo.number = _numPeopleController.text;
+                // reselInfo.time = _timeController.text;
+                // reselInfo.number = _numPeopleController.text;
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -140,13 +139,13 @@ class _reselvationState extends State<reselvation> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("User: ${reselInfo.user}"),
-                          Text("Date: ${reselInfo.date}"),
+                          Text("Date: ${reselInfo.sdate}"),
                           Text("Time: ${reselInfo.time}"),
                           Text("From: ${reselInfo.from}"),
                           Text("Destination: ${reselInfo.destination}"),
-                          Text("Transfer: ${reselInfo.transfer}"),
-                          Text("Number of People: ${reselInfo.number}"),
-                          Text("Payment: ${reselInfo.pay}"),
+                          Text("Transfer: ${reselInfo.transport}"),
+                          Text("Number of People: ${reselInfo.people}"),
+                          Text("Payment: ${reselInfo.fee}"),
                         ],
                       ),
                       actions: [

@@ -52,7 +52,7 @@ class _CalendarState extends State<Calendar> {
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(
               builder: (context) {
-                reselInfo.date = DateFormat("yyyy-MM-dd").format(selectedDay);
+                // reselInfo.sdate = DateFormat("yyyy-MM-dd").format(selectedDay);
                 print(reselInfo);
                 return Maps(reselInfo: reselInfo);
               },
