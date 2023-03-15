@@ -15,13 +15,16 @@ class StaticViewModel with ChangeNotifier {
   static const String loginButtonTitle = "이메일 로그인";
   static const String joinButtonTitle = "이메일 회원가입";
   static const String imageButtonTitle = "구글 로그인";
+  static const String passwordTextField = "비밀번호를 입력해주세요";
+
   static const String googleScopeEmail = "email";
-  static const String googleScopeAddr = "https://www.googleapis.com/auth/contacts.readonly";
+  static const String googleScopeAddr =
+      "https://www.googleapis.com/auth/contacts.readonly";
 }
 
 class LoginViewModel with ChangeNotifier {
-  final String _email = "";
-  final String _password = "";
+  String email = "";
+  String password = "";
 
   GoogleSignInAccount? _currentUser;
   late ReselInfo reselInfo = ReselInfo(user: "");
@@ -35,6 +38,11 @@ class LoginViewModel with ChangeNotifier {
       StaticViewModel.googleScopeAddr,
     ],
   );
+
+  void changeUpdateValue(String stateValue, String value) {
+    stateValue = value;
+    notifyListeners();
+  }
 
   loginUser() {
     /**
@@ -52,11 +60,11 @@ class LoginViewModel with ChangeNotifier {
     googleSignIn.signInSilently();
   }
 
-  Future<void> _login(BuildContext context) async {
+  Future<void> login(BuildContext context) async {
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _email,
-        password: _password,
+        email: email,
+        password: password,
       );
     } on FirebaseAuthException catch (e) {
       String message = "";

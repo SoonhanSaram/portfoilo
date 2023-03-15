@@ -1,4 +1,4 @@
-package com.kyoungmin.reselvation
+package com.kyoungmin.reslevation
 
 import io.flutter.embedding.android.FlutterActivity
 
