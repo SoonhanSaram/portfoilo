@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:regist/dto/reselvation_info.dart';
+import 'package:regist/models/reselvation_model.dart';
+import 'package:regist/staticValue/static_value.dart';
 
 /*
  * extends 와 with 의 차이
@@ -9,34 +11,20 @@ import 'package:regist/dto/reselvation_info.dart';
  * with 는 다른 클래스를 상속 받으면서도 해당 클래스의 기능을 사용 할 수 있는 것
  */
 
-class StaticViewModel with ChangeNotifier {
-  static const String statePassword = "password";
-  static const String title = "Pick&Go";
-  static const String pageTitle = "로그인 페이지";
-  static const String loginButtonTitle = "이메일 로그인";
-  static const String joinButtonTitle = "이메일 회원가입";
-  static const String imageButtonTitle = "구글 로그인";
-  static const String passwordTextField = "비밀번호를 입력해주세요";
-  static const String emailTextField = "이메일을 입력해주세요";
-  static const String googleScopeEmail = "email";
-  static const String googleScopeAddr = "https://www.googleapis.com/auth/contacts.readonly";
-}
-
 class LoginViewModel with ChangeNotifier {
+  late ReselInfo reselInfo = ReselInfo(user: "");
   String email = "";
   String password = "";
-
   GoogleSignInAccount? _currentUser;
-
-  late ReselInfo reselInfo = ReselInfo(user: "");
-
-  late final GoogleSignInAccount? user = _currentUser;
+  late GoogleSignInAccount? user = _currentUser;
+  User? auth;
+  final _reselvationModel = ReselvationModel();
 
   // google 로그인을 수행하기 위한 초기화 함수
   GoogleSignIn googleSignIn = GoogleSignIn(
     scopes: [
-      StaticViewModel.googleScopeEmail,
-      StaticViewModel.googleScopeAddr,
+      StaticValues.googleScopeEmail,
+      StaticValues.googleScopeAddr,
     ],
   );
 
@@ -47,8 +35,6 @@ class LoginViewModel with ChangeNotifier {
     } else if (fieldName == "password") {
       password = value;
     }
-    print("$email, $password");
-    notifyListeners();
   }
 
   void loginUser() {
@@ -64,16 +50,19 @@ class LoginViewModel with ChangeNotifier {
         notifyListeners();
       },
     );
+
     googleSignIn.signInSilently();
+    notifyListeners();
   }
 
   Future<void> login(BuildContext context) async {
-    print(email + password);
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      auth = credential.user;
+      reselInfo.user = auth!.displayName ?? "";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       String message = "";

@@ -1,59 +1,63 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:regist/calendar.dart';
-import 'package:regist/dto/reselvation_info.dart';
+import 'package:provider/provider.dart';
 import 'package:regist/membership_regist.dart';
+import 'package:regist/regist_page.dart';
+import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/viewmodel/user_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Future.delayed(const Duration(seconds: 3));
   await Firebase.initializeApp();
-  runApp(App());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => LoginViewModel(),
+        ),
+      ],
+      child: const App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
-  App({super.key});
-  final LoginViewModel _loginViewModel = LoginViewModel();
+  const App({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: StaticViewModel.title,
+      title: StaticValues.title,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
-      home: HomePage(
-        loginViewModel: _loginViewModel,
-      ),
+      home: const HomePage(),
     );
   }
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key, required this.loginViewModel});
-
-  final LoginViewModel loginViewModel;
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(StaticViewModel.title),
+        title: const Text(StaticValues.title),
       ),
       body: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
-        child: _buildBody(loginViewModel, context),
+        child: _buildBody(context),
       ),
     );
   }
 }
 
-_buildBody(LoginViewModel loginViewModel, BuildContext context) {
-  final GoogleSignInAccount? user = loginViewModel.user;
-  final ReselInfo reselInfo = loginViewModel.reselInfo;
-  final GoogleSignIn googleSignIn = loginViewModel.googleSignIn;
-  if (user != null) {
+_buildBody(BuildContext context) {
+  var loginViewModel = context.watch<LoginViewModel>();
+  if (loginViewModel.auth != null) {
     return RegisterScreen(
-      reselInfo: reselInfo,
+      reselInfo: loginViewModel.reselInfo,
     );
   } else {
     return Expanded(
@@ -64,8 +68,11 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
             fit: FlexFit.loose,
             flex: 2,
             child: Text(
-              StaticViewModel.pageTitle,
-              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
+              StaticValues.pageTitle,
+              style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.blue),
             ),
           ),
           Flexible(
@@ -74,12 +81,11 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
             child: Column(
               children: [
                 inputBox(
-                    labelText: StaticViewModel.emailTextField,
+                    labelText: StaticValues.emailTextField,
                     keyboardType: TextInputType.emailAddress,
-                    stateValue: loginViewModel.email,
                     onChange: (value) => {
                           loginViewModel.changeUpdateValue(
-                            StaticViewModel.googleScopeEmail,
+                            StaticValues.googleScopeEmail,
                             value,
                           )
                         }),
@@ -87,13 +93,12 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
                   height: 20,
                 ),
                 inputBox(
-                    labelText: StaticViewModel.passwordTextField,
+                    labelText: StaticValues.passwordTextField,
                     obscureText: true,
-                    stateValue: loginViewModel.password,
                     keyboardType: TextInputType.text,
                     onChange: (value) => {
                           loginViewModel.changeUpdateValue(
-                            StaticViewModel.statePassword,
+                            StaticValues.statePassword,
                             value,
                           )
                         }),
@@ -102,7 +107,7 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
                       await loginViewModel.login(context);
                     },
                     child: const Text(
-                      StaticViewModel.loginButtonTitle,
+                      StaticValues.loginButtonTitle,
                       style: TextStyle(fontSize: 24),
                     )),
               ],
@@ -123,10 +128,13 @@ _buildBody(LoginViewModel loginViewModel, BuildContext context) {
                 children: [
                   TextButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const EmailRegist()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const EmailRegist()));
                       },
-                      child: const Text(StaticViewModel.joinButtonTitle)),
-                  loginButton(googleSignIn),
+                      child: const Text(StaticValues.joinButtonTitle)),
+                  loginButton(loginViewModel.googleSignIn),
                 ],
               )),
         ],
@@ -146,7 +154,9 @@ TextFormField inputBox({
     keyboardType: keyboardType,
     onChanged: onChange,
     obscureText: obscureText,
-    decoration: InputDecoration(labelText: labelText, labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 }
 
@@ -178,7 +188,7 @@ GestureDetector loginButton(GoogleSignIn googleSignIn) {
           child: const Padding(
             padding: EdgeInsets.all(8.0),
             child: Text(
-              StaticViewModel.imageButtonTitle,
+              StaticValues.imageButtonTitle,
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -205,54 +215,4 @@ Center iconButton() {
       ),
     ),
   );
-}
-
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key, this.reselInfo});
-  final reselInfo;
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF2186D1),
-          borderRadius: BorderRadius.circular(16.0), // Container의 모서리를 둥글게 설정
-        ),
-        height: 200,
-        width: 200,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '예약하러 가기',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            registButton(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  ElevatedButton registButton(context) {
-    return ElevatedButton(
-      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.white)),
-      onPressed: () {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return Calendar(reselInfo: reselInfo);
-          },
-        ));
-      },
-      child: const Text(
-        '예약',
-        style: TextStyle(color: Colors.black, fontSize: 20),
-      ),
-    );
-  }
 }
