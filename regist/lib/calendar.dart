@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:regist/dto/reselvation_info.dart';
-import 'package:regist/maps.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:provider/provider.dart';
+import 'package:regist/staticValue/static_value.dart';
+import 'package:regist/ui_modules/ui_modules.dart';
+import 'package:regist/viewmodel/login_view_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Calendar extends StatefulWidget {
-  const Calendar({super.key, this.reselInfo});
-  final reselInfo;
+  const Calendar({super.key});
 
   @override
   State<Calendar> createState() => _CalendarState();
 }
 
 class _CalendarState extends State<Calendar> {
-  late ReselInfo reselInfo;
-
   @override
   void initState() {
     super.initState();
-    reselInfo = widget.reselInfo;
   }
+
+  late int selectedHours;
+  late int selectedMinutes;
+
+  late String _stime;
 
   DateTime selectedDay = DateTime(
     DateTime.now().year,
@@ -30,6 +33,9 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
+    final medaiQuery = MediaQuery.of(context);
+    var loginViewModel = context.watch<LoginViewModel>();
+    var uiMdules = UiModules();
     return Scaffold(
       appBar: AppBar(title: const Text("날짜선택")),
       body: Column(children: [
@@ -41,6 +47,8 @@ class _CalendarState extends State<Calendar> {
             setState(() {
               this.selectedDay = selectedDay;
               this.focusedDay = focusedDay;
+              loginViewModel.reselInfo.resDate = selectedDay.toString();
+              print(loginViewModel.reselInfo.sdate.substring(0, 10));
             });
           },
           selectedDayPredicate: (DateTime day) {
@@ -50,13 +58,54 @@ class _CalendarState extends State<Calendar> {
         ),
         TextButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) {
-                // reselInfo.sdate = DateFormat("yyyy-MM-dd").format(selectedDay);
-                print(reselInfo);
-                return Maps(reselInfo: reselInfo);
-              },
-            ));
+            showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Flexible(
+                      fit: FlexFit.loose,
+                      child: Stack(
+                        children: [
+                          SizedBox(
+                            height: medaiQuery.size.height * 0.35,
+                            child: Column(
+                              children: [
+                                const Text(
+                                  StaticValues.timePicker,
+                                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TimePickerSpinner(
+                                    highlightedTextStyle: const TextStyle(color: Colors.black, fontSize: 36),
+                                    time: DateTime.utc(0, 0, 0, 0, 0, 0),
+                                    is24HourMode: true,
+                                    isForce2Digits: true,
+                                    onTimeChange: (time) {
+                                      setState(
+                                        () {
+                                          selectedHours = time.hour;
+                                          selectedMinutes = time.minute;
+                                          loginViewModel.reselInfo.resTime = ("$selectedHours시 : $selectedMinutes분");
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => uiMdules.toMaps(context),
+                                  child: const Text(
+                                    StaticValues.timePickerButton,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ));
+                });
           },
           child: const Text("선택"),
         )

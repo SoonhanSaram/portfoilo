@@ -1,11 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/membership_regist.dart';
-import 'package:regist/regist_page.dart';
+import 'package:regist/menu_page.dart';
+import 'package:regist/models/reselvation_info.dart';
 import 'package:regist/staticValue/static_value.dart';
-import 'package:regist/viewmodel/user_view_model.dart';
+import 'package:regist/viewmodel/booked_view_model.dart';
+import 'package:regist/viewmodel/login_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +15,19 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider(
+          create: (context) => ReselInfo(user: "undetermined user"),
+        ),
         ChangeNotifierProvider(
           create: (_) => LoginViewModel(),
         ),
+        ChangeNotifierProxyProvider<LoginViewModel, BookedViewModel>(
+          create: (_) => BookedViewModel(LoginViewModel()),
+          update: (_, loginViewModel, bookedViewModel) {
+            bookedViewModel!.loginViewModel = loginViewModel;
+            return bookedViewModel;
+          },
+        )
       ],
       child: const App(),
     ),
@@ -55,116 +66,92 @@ class HomePage extends StatelessWidget {
 
 _buildBody(BuildContext context) {
   var loginViewModel = context.watch<LoginViewModel>();
-  if (loginViewModel.auth != null) {
-    return RegisterScreen(
-      reselInfo: loginViewModel.reselInfo,
-    );
-  } else {
-    return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          const Flexible(
-            fit: FlexFit.loose,
-            flex: 2,
-            child: Text(
-              StaticValues.pageTitle,
-              style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue),
-            ),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 4,
-            child: Column(
-              children: [
-                inputBox(
-                    labelText: StaticValues.emailTextField,
-                    keyboardType: TextInputType.emailAddress,
-                    onChange: (value) => {
-                          loginViewModel.changeUpdateValue(
-                            StaticValues.googleScopeEmail,
-                            value,
-                          )
-                        }),
-                const SizedBox(
-                  height: 20,
-                ),
-                inputBox(
-                    labelText: StaticValues.passwordTextField,
-                    obscureText: true,
-                    keyboardType: TextInputType.text,
-                    onChange: (value) => {
-                          loginViewModel.changeUpdateValue(
-                            StaticValues.statePassword,
-                            value,
-                          )
-                        }),
-                TextButton(
-                    onPressed: () async {
-                      await loginViewModel.login(context);
-                    },
-                    child: const Text(
-                      StaticValues.loginButtonTitle,
-                      style: TextStyle(fontSize: 24),
-                    )),
-              ],
-            ),
-          ),
+  var bookedViewModel = context.watch<BookedViewModel>();
 
-          /**
+  if (loginViewModel.auth != null || loginViewModel.currentUser != null) {
+    return const MenuPage();
+  } else if (loginViewModel.auth == null || loginViewModel.currentUser?.displayName == null) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        const Flexible(
+          fit: FlexFit.loose,
+          flex: 2,
+          child: Text(
+            StaticValues.pageTitle,
+            style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
+          ),
+        ),
+        Flexible(
+          fit: FlexFit.tight,
+          flex: 4,
+          child: Column(
+            children: [
+              inputBox(
+                  labelText: StaticValues.emailTextField,
+                  keyboardType: TextInputType.emailAddress,
+                  onChange: (value) => {
+                        loginViewModel.changeUpdateValue(
+                          StaticValues.googleScopeEmail,
+                          value,
+                        )
+                      }),
+              const SizedBox(
+                height: 20,
+              ),
+              inputBox(
+                  labelText: StaticValues.passwordTextField,
+                  obscureText: true,
+                  keyboardType: TextInputType.text,
+                  onChange: (value) => {
+                        loginViewModel.changeUpdateValue(
+                          StaticValues.statePassword,
+                          value,
+                        )
+                      }),
+              TextButton(
+                  onPressed: () async {
+                    await loginViewModel.login(context);
+                  },
+                  child: const Text(
+                    StaticValues.loginButtonTitle,
+                    style: TextStyle(fontSize: 24),
+                  )),
+            ],
+          ),
+        ),
+
+        /**
              * Flexible
              * 내부에 있는 widget 이 화면을 벗어나려고 할 때,
              * fit 속성을 Flexible.tight 로 설정하면
              * 화면 범위내에서 화면에 남은 영역만 차지하도록
              * 내부 화면 범위를 제한
              */
-          Flexible(
-              flex: 2,
-              fit: FlexFit.loose,
-              child: Column(
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const EmailRegist()));
-                      },
-                      child: const Text(StaticValues.joinButtonTitle)),
-                  loginButton(loginViewModel.googleSignIn),
-                ],
-              )),
-        ],
-      ),
+        Flexible(
+            flex: 2,
+            fit: FlexFit.loose,
+            child: Column(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const EmailRegist()));
+                  },
+                  child: const Text(StaticValues.joinButtonTitle),
+                ),
+                loginButton(loginViewModel, context),
+              ],
+            )),
+      ],
     );
   }
 }
 
-TextFormField inputBox({
-  String labelText = "",
-  bool obscureText = false,
-  String stateValue = "",
-  TextInputType keyboardType = TextInputType.emailAddress,
-  required Set<void> Function(dynamic) onChange,
-}) {
-  return TextFormField(
-    keyboardType: keyboardType,
-    onChanged: onChange,
-    obscureText: obscureText,
-    decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-  );
-}
-
-GestureDetector loginButton(GoogleSignIn googleSignIn) {
+GestureDetector loginButton(LoginViewModel loginViewModel, BuildContext context) {
   return GestureDetector(
     onTap: () async {
       try {
-        await googleSignIn.signIn();
+        await loginViewModel.loginUser(context);
       } catch (e) {
         print(e);
       }
@@ -214,5 +201,20 @@ Center iconButton() {
         size: 200,
       ),
     ),
+  );
+}
+
+TextFormField inputBox({
+  String labelText = "",
+  bool obscureText = false,
+  String stateValue = "",
+  TextInputType keyboardType = TextInputType.emailAddress,
+  required Set<void> Function(dynamic) onChange,
+}) {
+  return TextFormField(
+    keyboardType: keyboardType,
+    onChanged: onChange,
+    obscureText: obscureText,
+    decoration: InputDecoration(labelText: labelText, labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 }

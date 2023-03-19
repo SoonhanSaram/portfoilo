@@ -2,36 +2,45 @@ class ReselInfo {
   ReselInfo({
     required this.user,
     this.sdate = "",
-    this.time = "",
+    this.stime = "",
+    this.resDate = "",
+    this.resTime = "",
     this.from = "",
     this.destination = "",
     this.transport = "",
     this.people = "",
     this.fee = "",
     this.edate = "",
+    this.etime = "",
   });
 
-  String? user;
-  final String sdate;
-  final String time;
-  final String from;
-  final String destination;
-  final String transport;
-  final String people;
-  final String fee;
-  final String edate;
+  String user;
 
+  String sdate;
+  String stime;
+  String resDate;
+  String resTime;
+  String from;
+  String destination;
+  String transport;
+  String people;
+  String fee;
+  String edate;
+  String etime;
+
+  // Firebase 에 입력하기 위한 직렬화(serialization)
   Map<String, dynamic> toMap() {
     return {
       'user': user,
       'sdate': sdate,
-      'time': time,
+      'time': stime,
       'from': from,
       'destination': destination,
       'transport': transport,
       'people': people,
       'fee': fee,
       'edate': edate,
+      'etime': etime,
     };
   }
 
@@ -39,7 +48,7 @@ class ReselInfo {
         user: json['user'],
         sdate: json['sdate'],
         edate: json['edate'],
-        time: json['sdate'],
+        stime: json['sdate'],
         from: json['sdate'],
         destination: json['sdate'],
         transport: json['sdate'],

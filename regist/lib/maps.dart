@@ -4,12 +4,12 @@ import "package:flutter/material.dart";
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kpostal/kpostal.dart';
-import 'package:regist/dto/reselvation_info.dart';
+import 'package:regist/models/reselvation_info.dart';
 import 'package:regist/reselvation.dart';
 
 class Maps extends StatefulWidget {
-  const Maps({super.key, this.reselInfo});
-  final reselInfo;
+  const Maps({super.key});
+
   @override
   State<Maps> createState() => MapSampleState();
 }
@@ -19,7 +19,6 @@ class MapSampleState extends State<Maps> {
   @override
   void initState() {
     super.initState();
-    reselInfo = widget.reselInfo;
   }
 
   String postCode = "";

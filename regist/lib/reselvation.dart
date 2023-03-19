@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:regist/dto/reselvation_info.dart';
+import 'package:regist/models/reselvation_info.dart';
 
 class reselvation extends StatefulWidget {
   const reselvation({super.key, this.reselInfo});
@@ -46,56 +46,54 @@ class _reselvationState extends State<reselvation> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                padding: const EdgeInsets.all(16.0),
-                childAspectRatio: 3.0,
-                crossAxisSpacing: 10.0,
-                mainAxisSpacing: 10.0,
-                children: <Widget>[
-                  TextField(
-                    controller: _dateController,
-                    decoration: const InputDecoration(
-                      labelText: '출발 날짜',
-                      border: OutlineInputBorder(),
-                    ),
+            GridView.count(
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(16.0),
+              childAspectRatio: 3.0,
+              crossAxisSpacing: 10.0,
+              mainAxisSpacing: 10.0,
+              children: <Widget>[
+                TextField(
+                  controller: _dateController,
+                  decoration: const InputDecoration(
+                    labelText: '출발 날짜',
+                    border: OutlineInputBorder(),
                   ),
-                  TextField(
-                    keyboardType: TextInputType.phone,
-                    controller: _timeController,
-                    decoration: const InputDecoration(
-                      labelText: "출발 시간",
-                      suffixText: "시",
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                TextField(
+                  keyboardType: TextInputType.phone,
+                  controller: _timeController,
+                  decoration: const InputDecoration(
+                    labelText: "출발 시간",
+                    suffixText: "시",
+                    border: OutlineInputBorder(),
                   ),
-                  TextField(
-                    controller: _numPeopleController,
-                    keyboardType: TextInputType.phone,
-                    decoration: const InputDecoration(
-                      labelText: '인원수',
-                      suffixText: "명",
-                      hintText: '1~10 또는 10인초과',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                TextField(
+                  controller: _numPeopleController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: '인원수',
+                    suffixText: "명",
+                    hintText: '1~10 또는 10인초과',
+                    border: OutlineInputBorder(),
                   ),
-                  TextField(
-                    controller: _departureController,
-                    decoration: const InputDecoration(
-                      labelText: 'From',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                TextField(
+                  controller: _departureController,
+                  decoration: const InputDecoration(
+                    labelText: 'From',
+                    border: OutlineInputBorder(),
                   ),
-                  TextField(
-                    controller: _destinationController,
-                    decoration: const InputDecoration(
-                      labelText: 'To',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                TextField(
+                  controller: _destinationController,
+                  decoration: const InputDecoration(
+                    labelText: 'To',
+                    border: OutlineInputBorder(),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -140,7 +138,7 @@ class _reselvationState extends State<reselvation> {
                         children: [
                           Text("User: ${reselInfo.user}"),
                           Text("Date: ${reselInfo.sdate}"),
-                          Text("Time: ${reselInfo.time}"),
+                          Text("Time: ${reselInfo.etime}"),
                           Text("From: ${reselInfo.from}"),
                           Text("Destination: ${reselInfo.destination}"),
                           Text("Transfer: ${reselInfo.transport}"),
