@@ -3,6 +3,8 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
+import 'package:regist/viewmodel/booked_view_model.dart';
+
 import 'package:regist/viewmodel/login_view_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -35,6 +37,7 @@ class _CalendarState extends State<Calendar> {
   Widget build(BuildContext context) {
     final medaiQuery = MediaQuery.of(context);
     var loginViewModel = context.watch<LoginViewModel>();
+    var bookedViewModel = context.watch<BookedViewModel>();
     var uiMdules = UiModules();
     return Scaffold(
       appBar: AppBar(title: const Text("날짜선택")),
@@ -44,12 +47,14 @@ class _CalendarState extends State<Calendar> {
           firstDay: DateTime.utc(2023, 1, 1),
           lastDay: DateTime.utc(2030, 12, 31),
           onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              this.selectedDay = selectedDay;
-              this.focusedDay = focusedDay;
-              loginViewModel.reselInfo.resDate = selectedDay.toString();
-              print(loginViewModel.reselInfo.sdate.substring(0, 10));
-            });
+            setState(
+              () {
+                this.selectedDay = selectedDay;
+                this.focusedDay = focusedDay;
+                bookedViewModel.resDate =
+                    selectedDay.toString().substring(0, 10);
+              },
+            );
           },
           selectedDayPredicate: (DateTime day) {
             // selectedDay 와 동일한 날짜의 모양을 바꿔줍니다.
@@ -71,12 +76,15 @@ class _CalendarState extends State<Calendar> {
                               children: [
                                 const Text(
                                   StaticValues.timePicker,
-                                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
+                                  style: TextStyle(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.w900),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TimePickerSpinner(
-                                    highlightedTextStyle: const TextStyle(color: Colors.black, fontSize: 36),
+                                    highlightedTextStyle: const TextStyle(
+                                        color: Colors.black, fontSize: 36),
                                     time: DateTime.utc(0, 0, 0, 0, 0, 0),
                                     is24HourMode: true,
                                     isForce2Digits: true,
@@ -85,7 +93,9 @@ class _CalendarState extends State<Calendar> {
                                         () {
                                           selectedHours = time.hour;
                                           selectedMinutes = time.minute;
-                                          loginViewModel.reselInfo.resTime = ("$selectedHours시 : $selectedMinutes분");
+
+                                          bookedViewModel.resTime =
+                                              ("$selectedHours시 : $selectedMinutes분");
                                         },
                                       );
                                     },

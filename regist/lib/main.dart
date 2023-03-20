@@ -22,9 +22,9 @@ void main() async {
           create: (_) => LoginViewModel(),
         ),
         ChangeNotifierProxyProvider<LoginViewModel, BookedViewModel>(
-          create: (_) => BookedViewModel(LoginViewModel()),
+          create: (_) => BookedViewModel(),
           update: (_, loginViewModel, bookedViewModel) {
-            bookedViewModel!.loginViewModel = loginViewModel;
+            bookedViewModel!.user = loginViewModel.reselInfo!.user;
             return bookedViewModel;
           },
         )
@@ -70,7 +70,8 @@ _buildBody(BuildContext context) {
 
   if (loginViewModel.auth != null || loginViewModel.currentUser != null) {
     return const MenuPage();
-  } else if (loginViewModel.auth == null || loginViewModel.currentUser?.displayName == null) {
+  } else if (loginViewModel.auth == null ||
+      loginViewModel.currentUser?.displayName == null) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -79,7 +80,8 @@ _buildBody(BuildContext context) {
           flex: 2,
           child: Text(
             StaticValues.pageTitle,
-            style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
+            style: TextStyle(
+                fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
           ),
         ),
         Flexible(
@@ -135,7 +137,10 @@ _buildBody(BuildContext context) {
               children: [
                 TextButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const EmailRegist()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const EmailRegist()));
                   },
                   child: const Text(StaticValues.joinButtonTitle),
                 ),
@@ -147,7 +152,8 @@ _buildBody(BuildContext context) {
   }
 }
 
-GestureDetector loginButton(LoginViewModel loginViewModel, BuildContext context) {
+GestureDetector loginButton(
+    LoginViewModel loginViewModel, BuildContext context) {
   return GestureDetector(
     onTap: () async {
       try {
@@ -168,7 +174,7 @@ GestureDetector loginButton(LoginViewModel loginViewModel, BuildContext context)
             width: 35,
             height: 35,
             child: Image.asset(
-              "images/btn_google.png",
+              "assets/images/btn_google.png",
             )),
         Container(
           color: const Color(0xFF4285F4),
@@ -215,6 +221,8 @@ TextFormField inputBox({
     keyboardType: keyboardType,
     onChanged: onChange,
     obscureText: obscureText,
-    decoration: InputDecoration(labelText: labelText, labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 }

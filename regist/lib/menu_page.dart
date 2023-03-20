@@ -16,7 +16,7 @@ class MenuPage extends StatelessWidget {
     return Column(
       children: [
         Text(
-          "${loginViewModel.reselInfo.user}님 환영합니다",
+          "${loginViewModel.reselInfo!.user}님 환영합니다",
           style: const TextStyle(fontSize: 24),
         ),
         const Flexible(fit: FlexFit.tight, child: SizedBox()),
@@ -34,9 +34,12 @@ class MenuPage extends StatelessWidget {
                 StaticValues.mainPageTitle1,
                 () => uiModules.toCalendar(context),
               ),
-              reselvationButton(context, StaticValues.mainPageTitle2, () => uiModules.toCalendar(context)),
-              reselvationButton(context, StaticValues.mainMessage, () => uiModules.toCalendar(context)),
-              reselvationButton(context, StaticValues.mainAlarm, () => uiModules.toCalendar(context)),
+              reselvationButton(context, StaticValues.mainPageTitle2,
+                  () => uiModules.toCalendar(context)),
+              reselvationButton(context, StaticValues.mainMessage,
+                  () => uiModules.toCalendar(context)),
+              reselvationButton(context, StaticValues.mainAlarm,
+                  () => uiModules.toCalendar(context)),
             ],
           ),
         ),

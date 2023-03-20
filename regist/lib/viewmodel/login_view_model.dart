@@ -10,7 +10,11 @@ import 'package:regist/models/reselvation_info.dart';
  */
 
 class LoginViewModel with ChangeNotifier {
-  ReselInfo reselInfo = ReselInfo(user: "");
+  ReselInfo? reselInfo;
+
+  LoginViewModel() {
+    reselInfo = ReselInfo(user: "");
+  }
 
   User? auth;
   GoogleSignInAccount? currentUser;
@@ -37,16 +41,18 @@ class LoginViewModel with ChangeNotifier {
     try {
       currentUser = await GoogleSignIn().signIn();
       if (currentUser != null && currentUser?.displayName != null) {
-        reselInfo.user = currentUser!.displayName.toString();
+        reselInfo?.user = currentUser!.displayName.toString();
       }
 
-      final GoogleSignInAuthentication? googleAuth = await currentUser?.authentication;
-      final credential = GoogleAuthProvider.credential(accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
+      final GoogleSignInAuthentication? googleAuth =
+          await currentUser?.authentication;
+      final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
 
       notifyListeners();
     } catch (e) {
       String message = e.toString();
-
+      print(message);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -69,7 +75,7 @@ class LoginViewModel with ChangeNotifier {
       );
 
       auth = credential.user;
-      reselInfo.user = auth!.email ?? "";
+      reselInfo?.user = auth!.email ?? "";
 
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -104,14 +110,14 @@ class LoginViewModel with ChangeNotifier {
       if (await _googleSignIn.isSignedIn()) {
         await _googleSignIn.signOut().then(
               (value) => {
-                reselInfo.user = "",
+                reselInfo?.user = "",
                 currentUser = null,
-                print("${reselInfo.user}  ,$currentUser"),
+                print("${reselInfo?.user}  ,$currentUser"),
                 notifyListeners(),
               },
             );
       }
-      reselInfo.user = "";
+      reselInfo?.user = "";
 
       notifyListeners();
     } catch (e) {

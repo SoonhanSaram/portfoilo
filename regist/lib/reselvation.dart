@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:regist/models/reselvation_info.dart';
 
 class reselvation extends StatefulWidget {
-  const reselvation({super.key, this.reselInfo});
-  final reselInfo;
+  const reselvation({super.key});
+
   @override
   State<reselvation> createState() => _reselvationState();
 }
@@ -13,7 +13,7 @@ class _reselvationState extends State<reselvation> {
   @override
   void initState() {
     super.initState();
-    reselInfo = widget.reselInfo;
+
     _dateController.text = reselInfo.sdate;
     _departureController.text = reselInfo.from;
     _destinationController.text = reselInfo.destination;
@@ -114,7 +114,8 @@ class _reselvationState extends State<reselvation> {
                       _dropValue = value;
                     });
                   },
-                  items: <String>['승용차', '승합차', '리무진'].map<DropdownMenuItem<String>>((String value) {
+                  items: <String>['승용차', '승합차', '리무진']
+                      .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),

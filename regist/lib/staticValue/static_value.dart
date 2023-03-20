@@ -8,7 +8,8 @@ class StaticValues {
   static const String passwordTextField = "비밀번호를 입력해주세요";
   static const String emailTextField = "이메일을 입력해주세요";
   static const String googleScopeEmail = "email";
-  static const String googleScopeAddr = "https://www.googleapis.com/auth/contacts.readonly";
+  static const String googleScopeAddr =
+      "https://www.googleapis.com/auth/contacts.readonly";
   static const int backGroundColor = 0xFF2186D1;
   static const String mainPageTitle1 = '예약하러 가기';
   static const String mainPageTitle2 = "예약정보 확인";

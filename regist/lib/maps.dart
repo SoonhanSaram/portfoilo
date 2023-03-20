@@ -4,7 +4,7 @@ import "package:flutter/material.dart";
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kpostal/kpostal.dart';
-import 'package:regist/models/reselvation_info.dart';
+import 'package:location/location.dart';
 import 'package:regist/reselvation.dart';
 
 class Maps extends StatefulWidget {
@@ -15,11 +15,13 @@ class Maps extends StatefulWidget {
 }
 
 class MapSampleState extends State<Maps> {
-  late ReselInfo reselInfo;
-  @override
-  void initState() {
-    super.initState();
-  }
+  Location location = Location();
+  LatLng? _latLng;
+  CameraPosition? _kGooglePlex;
+  final List<Marker> _marker = [];
+
+  final CameraPosition _exeception =
+      const CameraPosition(target: LatLng(37.3512, 126.5834), zoom: 17.5);
 
   String postCode = "";
   String address = "";
@@ -31,6 +33,37 @@ class MapSampleState extends State<Maps> {
   final _destinationController = TextEditingController();
   final Set<Polyline> _polylines = <Polyline>{};
   PolylinePoints polylinePoints = PolylinePoints();
+
+  @override
+  void initState() {
+    super.initState();
+    Location.instance.onLocationChanged.listen(
+      (LocationData currentLocation) async {
+        if (currentLocation.latitude != null &&
+            currentLocation.longitude != null) {
+          setState(
+            () {
+              _latLng =
+                  LatLng(currentLocation.latitude!, currentLocation.longitude!);
+
+              _kGooglePlex = CameraPosition(
+                target: _latLng!,
+                zoom: 17.5,
+              );
+              _marker.add(
+                Marker(
+                  markerId: const MarkerId("내 위치"),
+                  draggable: true,
+                  position: _latLng!,
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
   @override
   void dispose() {
     _startController.dispose();
@@ -38,12 +71,8 @@ class MapSampleState extends State<Maps> {
     super.dispose();
   }
 
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.562591, 126.970805),
-    zoom: 17.5,
-  );
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
   final List<Marker> markers = [];
   addMarker(cordinate) {
@@ -53,7 +82,8 @@ class MapSampleState extends State<Maps> {
     // 마커 2개 사용하기
     String id = postCode;
     setState(() {
-      markers.add(Marker(position: cordinate, markerId: MarkerId(id.toString())));
+      markers
+          .add(Marker(position: cordinate, markerId: MarkerId(id.toString())));
     });
   }
 
@@ -63,15 +93,17 @@ class MapSampleState extends State<Maps> {
       body: Stack(
         children: [
           GoogleMap(
+            zoomControlsEnabled: false,
+            zoomGesturesEnabled: true,
             myLocationEnabled: true,
             mapType: MapType.normal,
-            initialCameraPosition: _kGooglePlex,
+            initialCameraPosition: _kGooglePlex!,
             onMapCreated: (GoogleMapController controller) async {
               setState(() {
                 _mapController = controller;
               });
             },
-            markers: markers.toSet(),
+            // markers: Set.from(_marker),
             onTap: (cordinate) {
               _mapController.animateCamera(CameraUpdate.newLatLng(cordinate));
             },
@@ -82,9 +114,15 @@ class MapSampleState extends State<Maps> {
               Center(
                 child: Column(
                   children: [
-                    searchBox(context: context, label: "출발지를 입력해주세요", controller: _startController),
+                    searchBox(
+                        context: context,
+                        label: "출발지를 입력해주세요",
+                        controller: _startController),
                     const SizedBox(height: 10),
-                    searchBox(context: context, label: "도착지를 입력해주세요", controller: _destinationController),
+                    searchBox(
+                        context: context,
+                        label: "도착지를 입력해주세요",
+                        controller: _destinationController),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -106,7 +144,11 @@ class MapSampleState extends State<Maps> {
     );
   }
 
-  TextField searchBox({required BuildContext context, String label = "출발지를 입력해주세요", required TextEditingController controller}) {
+  TextField searchBox({
+    required BuildContext context,
+    String label = "출발지를 입력해주세요",
+    required TextEditingController controller,
+  }) {
     return TextField(
       controller: controller,
       onTap: () {
@@ -122,7 +164,8 @@ class MapSampleState extends State<Maps> {
                 latitude = result.latitude!.toString();
                 longitude = result.longitude!.toString();
                 searchedPosition = LatLng(result.latitude!, result.longitude!);
-                _mapController.animateCamera(CameraUpdate.newLatLng(searchedPosition));
+                _mapController
+                    .animateCamera(CameraUpdate.newLatLng(searchedPosition));
                 addMarker(searchedPosition);
                 controller.text = address;
               },
@@ -149,7 +192,7 @@ class MapSampleState extends State<Maps> {
           builder: (context) {
             // reselInfo.from = _startController.text;
             // reselInfo.destination = _destinationController.text;
-            return reselvation(reselInfo: reselInfo);
+            return const reselvation();
           },
         ));
       },
