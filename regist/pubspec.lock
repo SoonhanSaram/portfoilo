@@ -161,6 +161,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
+  flinq:
+    dependency: transitive
+    description:
+      name: flinq
+      sha256: "828d6cc2f2525f2c1fbf1803f1a526f4c6592068b70f46609131d0cc0562f514"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -248,6 +256,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  google_directions_api:
+    dependency: "direct main"
+    description:
+      name: google_directions_api
+      sha256: "1463d07b82a46bcf48c9d37155ecfdd81bf6319a13176f04f5cea0daf3d2e2bf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.1"
   google_identity_services_web:
     dependency: transitive
     description:
@@ -256,6 +272,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
+  google_maps:
+    dependency: "direct main"
+    description:
+      name: google_maps
+      sha256: eb20a162d642599a05179e2d155b9e803899cb377764fdec9044fa7fa474bfb8
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.0"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -288,6 +312,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.6"
+  google_polyline_algorithm:
+    dependency: transitive
+    description:
+      name: google_polyline_algorithm
+      sha256: "357874f00d3f93c3ba1bf4b4d9a154aa9ee87147c068238c1e8392012b686a03"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -376,6 +408,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.5"
+  js_wrapping:
+    dependency: transitive
+    description:
+      name: js_wrapping
+      sha256: e385980f7c76a8c1c9a560dfb623b890975841542471eade630b2871d243851c
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.4"
   kpostal:
     dependency: "direct main"
     description:
