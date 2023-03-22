@@ -64,58 +64,60 @@ class _CalendarState extends State<Calendar> {
         TextButton(
           onPressed: () {
             showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Flexible(
-                      fit: FlexFit.loose,
-                      child: Stack(
-                        children: [
-                          SizedBox(
-                            height: medaiQuery.size.height * 0.35,
-                            child: Column(
-                              children: [
-                                const Text(
-                                  StaticValues.timePicker,
-                                  style: TextStyle(
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.w900),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: TimePickerSpinner(
-                                    highlightedTextStyle: const TextStyle(
-                                        color: Colors.black, fontSize: 36),
-                                    time: DateTime.utc(0, 0, 0, 0, 0, 0),
-                                    is24HourMode: true,
-                                    isForce2Digits: true,
-                                    onTimeChange: (time) {
-                                      setState(
-                                        () {
-                                          selectedHours = time.hour;
-                                          selectedMinutes = time.minute;
-
-                                          bookedViewModel.resTime =
-                                              ("$selectedHours시 : $selectedMinutes분");
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () => uiMdules.toMaps(context),
-                                  child: const Text(
-                                    StaticValues.timePickerButton,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                )
-                              ],
+              context: context,
+              builder: (context) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * 0.35,
+                        maxHeight: MediaQuery.of(context).size.height * 0.35),
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            const Text(
+                              StaticValues.timePicker,
+                              style: TextStyle(
+                                  fontSize: 26, fontWeight: FontWeight.w900),
                             ),
-                          ),
-                        ],
-                      ));
-                });
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TimePickerSpinner(
+                                highlightedTextStyle: const TextStyle(
+                                    color: Colors.black, fontSize: 36),
+                                time: DateTime.utc(0, 0, 0, 0, 0, 0),
+                                is24HourMode: true,
+                                isForce2Digits: true,
+                                onTimeChange: (time) {
+                                  setState(
+                                    () {
+                                      selectedHours = time.hour;
+                                      selectedMinutes = time.minute;
+
+                                      bookedViewModel.resTime =
+                                          ("$selectedHours시 : $selectedMinutes분");
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => uiMdules.toMaps(context),
+                              child: const Text(
+                                StaticValues.timePickerButton,
+                                style: TextStyle(
+                                  fontSize: 24,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
           },
           child: const Text("선택"),
         )

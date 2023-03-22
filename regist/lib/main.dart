@@ -10,6 +10,7 @@ import 'package:regist/viewmodel/login_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   // await Future.delayed(const Duration(seconds: 3));
   await Firebase.initializeApp();
   runApp(
@@ -40,6 +41,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: StaticValues.title,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
       home: const HomePage(),
