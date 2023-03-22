@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import "package:flutter/material.dart";
-import 'package:google_directions_api/google_directions_api.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:regist/dao/directions_respository.dart';
+import 'package:regist/models/directions.model.dart';
 import 'package:regist/result_page.dart';
 import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
@@ -19,18 +22,22 @@ class Maps extends StatefulWidget {
 }
 
 class MapSampleState extends State<Maps> {
+  Marker? _origin;
+  Marker? _destination;
+  Directions? _info;
+
   late double lat1;
   late double lng1;
   late double lat2;
   late double lng2;
-
+  late String locationOrigin = "";
+  late String locationDestination = "";
   Location location = Location();
   LatLng? _latLng;
   CameraPosition? _kGooglePlex;
   final List<Marker> _marker = [];
   double distance = 0;
-  final CameraPosition _exeception =
-      const CameraPosition(target: LatLng(37.3512, 126.5834), zoom: 17.5);
+  final CameraPosition _exeception = const CameraPosition(target: LatLng(37.3512, 126.5834), zoom: 17.5);
 
   String? postCode;
   String address = "";
@@ -40,37 +47,43 @@ class MapSampleState extends State<Maps> {
   late GoogleMapController _mapController;
   final _startController = TextEditingController();
   final _destinationController = TextEditingController();
-  late Set<Polyline> polylines = {};
+  late Map<PolylineId, Polyline> polylines = {};
   late List<LatLng> latLng = [];
-  // PolylinePoints polylinePoints = PolylinePoints();
-  // final PolylineResult _polyResult = PolylineResult(points: []);
+  PolylinePoints polylinePoints = PolylinePoints();
+  final PolylineResult _polyResult = PolylineResult(points: []);
 
-  Future<void> getPolylines(String location1, String location2) async {
-    DirectionsService.init("AIzaSyBlvArPjmzxG13H7YJTzglJK3KH4pU3ByQ");
-
-    final directionsService = DirectionsService();
-
-    final request = DirectionsRequest(
-      origin: location1,
-      destination: location2,
-      travelMode: TravelMode.driving,
+  Future<void> addPolyLine(List<LatLng> polylineCoordinates) async {
+    PolylineId id = const PolylineId("poly");
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: Colors.deepPurpleAccent,
+      points: polylineCoordinates,
+      width: 8,
     );
-    print(request);
-
-    try {
-      final response = await directionsService.route(request,
-          (DirectionsResult response, DirectionsStatus? status) {
-        if (status == DirectionsStatus.ok) {
-          print(response);
-        } else {
-          print("object");
-        }
-      });
-    } catch (e) {
-      print("error $e");
-    }
-    print("최종");
+    polylines[id] = polyline;
+    setState(() {});
   }
+
+  // directions API 요청법
+  // Future<void> getPolylines(TextEditingController startController, TextEditingController destinationController) async {
+  //   DirectionsService.init("AIzaSyBlvArPjmzxG13H7YJTzglJK3KH4pU3ByQ");
+
+  //   final directionsService = DirectionsService();
+
+  //   final request = DirectionsRequest(
+  //     origin: startController.text,
+  //     destination: destinationController.text,
+  //     travelMode: TravelMode.driving,
+  //   );
+
+  //   await directionsService.route(request, (DirectionsResult response, DirectionsStatus? status) {
+  //     if (status == DirectionsStatus.ok) {
+  //       print(response);
+  //     } else {
+  //       print("루트 에러, 결과 : $response , 상태 : $status");
+  //     }
+  //   });
+  // }
 
   Future<void> _fitBounds() async {
     final LatLngBounds bounds = LatLngBounds(
@@ -109,12 +122,10 @@ class MapSampleState extends State<Maps> {
     Timer(const Duration(seconds: 1), () {
       Location.instance.onLocationChanged.listen(
         (LocationData currentLocation) {
-          if (currentLocation.latitude != null &&
-              currentLocation.longitude != null) {
+          if (currentLocation.latitude != null && currentLocation.longitude != null) {
             setState(
               () {
-                _latLng = LatLng(
-                    currentLocation.latitude!, currentLocation.longitude!);
+                _latLng = LatLng(currentLocation.latitude!, currentLocation.longitude!);
 
                 _kGooglePlex = CameraPosition(
                   target: _latLng!,
@@ -150,32 +161,90 @@ class MapSampleState extends State<Maps> {
     super.dispose();
   }
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   final List<Marker> markers = [];
-  addMarker(cordinate, address) {
-    // marker 여러개 사용시
-    // int id = Random().nextInt(100);
-    // 한 개의 마커만 사용
-    // 마커 2개 사용하기
-    String id = address!;
-    setState(() {
-      markers
-          .add(Marker(position: cordinate, markerId: MarkerId(id.toString())));
-    });
+  final List<String> _location = [];
+  // directions 사용하기 위한 addMarker 함수
+  Future<void> addMarker(String location, LatLng pos) async {
+    if (_origin == null || (_origin != null && _destination != null)) {
+      setState(() {
+        _location.add(location);
+        _origin = Marker(
+          markerId: const MarkerId(
+            StaticValues.markerOrigin,
+          ),
+          infoWindow: const InfoWindow(title: StaticValues.markerOrigin),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
+          position: pos,
+        );
+        _destination = null;
+        _info = null;
+      });
+    } else {
+      _location.add(location);
+      setState(() {
+        _destination = Marker(
+          markerId: const MarkerId(
+            StaticValues.markerDestination,
+          ),
+          infoWindow: const InfoWindow(title: StaticValues.markerDestination),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          position: pos,
+        );
+      });
+      print("위치정보 ${_location[0]}, ${_location[1]}");
+      final directions = await DirectionsRepository().getDirections(
+        origin: _origin!.position,
+        destination: pos,
+      );
+      print("여기");
+      setState(() => _info = directions);
+    }
   }
+
+  // 기존 addMarker 함수
+  // addMarker(cordinate, address) async {
+  // marker 여러개 사용시
+  // int id = Random().nextInt(100);
+  // 한 개의 마커만 사용
+  // 마커 2개 사용하기
+  // String id = address!;
+  // setState(() {
+  // markers.add(
+  // Marker(
+  // position: cordinate,
+  // markerId: MarkerId(
+  // id.toString(),
+  // ),
+  // infoWindow: InfoWindow(
+  // title: id.toString(),
+  // ),
+  // ),
+  // );
+  // });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    var uiModules = UiModules();
     var bookedViewModel = context.watch<BookedViewModel>();
     return Scaffold(
       body: Stack(
         children: [
           GoogleMap(
-            polylines: polylines,
-            markers: Set.from(markers),
+            polylines: {
+              if (_info != null)
+                Polyline(
+                  polylineId: const PolylineId("overview_polyline"),
+                  color: Colors.red,
+                  width: 3,
+                  points: _info!.polylinePoints.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+                )
+            },
+            markers: {
+              if (_origin != null) _origin!,
+              if (_destination != null) _destination!,
+            },
             zoomControlsEnabled: false,
             zoomGesturesEnabled: true,
             myLocationEnabled: true,
@@ -206,28 +275,26 @@ class MapSampleState extends State<Maps> {
                   child: Column(
                     children: [
                       searchBox(
-                          context: context,
-                          label: StaticValues.mapSearchBox1,
-                          location: bookedViewModel.from,
-                          controller: _startController,
-                          uiModules: uiModules,
-                          polyResult: () => getPolylines(bookedViewModel.from,
-                              bookedViewModel.destination),
-                          bookedViewModel: bookedViewModel,
-                          place: bookedViewModel.from),
+                        context: context,
+                        label: StaticValues.mapSearchBox1,
+                        location: locationOrigin,
+                        locationOrigin: locationOrigin,
+                        locationDestination: locationDestination,
+                        controller: _startController,
+                        bookedViewModel: bookedViewModel,
+                        uiModules: UiModules(),
+                      ),
                       const SizedBox(height: 10),
                       searchBox(
-                          context: context,
-                          label: StaticValues.mapSearchBox2,
-                          location: bookedViewModel.destination,
-                          controller: _destinationController,
-                          uiModules: uiModules,
-                          polyResult: () => getPolylines(
-                                bookedViewModel.from,
-                                bookedViewModel.destination,
-                              ),
-                          bookedViewModel: bookedViewModel,
-                          place: bookedViewModel.destination),
+                        context: context,
+                        label: StaticValues.mapSearchBox2,
+                        location: locationDestination,
+                        locationDestination: locationDestination,
+                        locationOrigin: locationOrigin,
+                        controller: _destinationController,
+                        bookedViewModel: bookedViewModel,
+                        uiModules: UiModules(),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -250,8 +317,7 @@ class MapSampleState extends State<Maps> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(width: 1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8)),
+                          borderRadius: const BorderRadius.all(Radius.circular(8)),
                         ),
                         child: Text("$distance KM"),
                       ),
@@ -268,83 +334,33 @@ class MapSampleState extends State<Maps> {
     required BuildContext context,
     required String label,
     required String location,
+    required String locationOrigin,
+    required String locationDestination,
     required TextEditingController controller,
-    required UiModules uiModules,
-    required Function polyResult,
     required BookedViewModel bookedViewModel,
-    String? place,
+    required UiModules uiModules,
   }) {
     return TextField(
       controller: controller,
-      onTap: () {
+      onTap: () async {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => KpostalView(
               useLocalServer: true,
               localPort: 1024,
-              callback: (result) {
+              callback: (result) async {
                 postCode = result.postCode;
                 address = result.address;
                 latitude = result.latitude!.toString();
                 longitude = result.longitude!.toString();
                 searchedPosition = LatLng(result.latitude!, result.longitude!);
-                place = address;
-                _mapController
-                    .animateCamera(CameraUpdate.newLatLng(searchedPosition));
-                addMarker(searchedPosition, address);
+                _mapController.animateCamera(CameraUpdate.newLatLng(searchedPosition));
+
                 controller.text = address;
                 latLng.add(searchedPosition);
 
-                setState(() async {
-                  if (latLng.length == 2) {
-                    distance = 0;
-
-                    late List latingArr;
-                    late String latlngStr;
-                    late List locationArr = [];
-                    try {
-                      for (var i = 0; i < latLng.length; i++) {
-                        latlngStr = latLng[i].toString();
-                        latingArr = latlngStr.split(
-                          RegExp(r'[,\s()]'),
-                        );
-                        locationArr.add([...latingArr]);
-                      }
-                    } catch (e) {
-                      print(e);
-                    }
-
-                    lat1 = double.parse(locationArr[0][1]);
-                    lng1 = double.parse(locationArr[0][3]);
-                    lat2 = double.parse(locationArr[1][1]);
-                    lng2 = double.parse(locationArr[1][3]);
-                    distance += uiModules.distance(lat1, lng1, lat2, lng2);
-                    if (bookedViewModel.from.isNotEmpty &&
-                        bookedViewModel.destination.isNotEmpty) {
-                      polyResult(
-                          bookedViewModel.from, bookedViewModel.destination);
-                      print('경로 $polyResult');
-                    }
-
-                    // Polyline pathPolyline = Polyline(
-                    // polylineId: const PolylineId("path"),
-                    // points: polyResult.
-                    // .map(
-                    // (e) => LatLng(e.latitude, e.longitude),
-                    // )
-                    // .toList(),
-                    // width: 2,
-                    // color: Colors.orangeAccent);
-                    // print("path : $pathPolyline");
-                    // polylines.add(pathPolyline);
-                    // print("여기");
-                    // debugPrint(polylines.toString());
-                  } else if (latLng.length > 2) {
-                    distance = 0;
-                    latLng = [];
-                  }
-                });
+                addMarker(address, searchedPosition);
               },
             ),
           ),
@@ -362,12 +378,10 @@ class MapSampleState extends State<Maps> {
     );
   }
 
-  TextButton completeButton(
-      BuildContext context, BookedViewModel bookedViewModel) {
+  TextButton completeButton(BuildContext context, BookedViewModel bookedViewModel) {
     return TextButton(
       onPressed: () {
-        if (_startController.text.isEmpty != true &&
-            _destinationController.text.isEmpty != true) {
+        if (_startController.text.isEmpty != true && _destinationController.text.isEmpty != true) {
           _showBottomSheet(context, bookedViewModel);
           // print("${bookedViewModel.from}, ${bookedViewModel.destination}");
         } else if (_startController.text.isEmpty == true) {
@@ -492,3 +506,56 @@ void _showBottomSheet(BuildContext context, BookedViewModel bookedViewModel) {
     },
   );
 }
+
+
+// try {
+//                   if (_startController.text.isNotEmpty && _destinationController.text.isNotEmpty) {
+//                     setState(() {
+//                       if (latLng.length == 2) {
+//                         distance = 0;
+
+//                         late List latingArr;
+//                         late String latlngStr;
+//                         late List locationArr = [];
+//                         try {
+//                           for (var i = 0; i < latLng.length; i++) {
+//                             latlngStr = latLng[i].toString();
+//                             latingArr = latlngStr.split(
+//                               RegExp(r'[,\s()]'),
+//                             );
+//                             locationArr.add([...latingArr]);
+//                           }
+//                         } catch (e) {
+//                           print(e);
+//                         }
+
+//                         lat1 = double.parse(locationArr[0][1]);
+//                         lng1 = double.parse(locationArr[0][3]);
+//                         lat2 = double.parse(locationArr[1][1]);
+//                         lng2 = double.parse(locationArr[1][3]);
+//                         distance += uiModules.distance(lat1, lng1, lat2, lng2);
+
+//                         // getPolylines(_startController, _destinationController);
+//                         // print(getPolylines);
+//                         // Polyline pathPolyline = Polyline(
+//                         // polylineId: const PolylineId("path"),
+//                         // points: polyResult.
+//                         // .map(
+//                         // (e) => LatLng(e.latitude, e.longitude),
+//                         // )
+//                         // .toList(),
+//                         // width: 2,
+//                         // color: Colors.orangeAccent);
+//                         // print("path : $pathPolyline");
+//                         // polylines.add(pathPolyline);
+//                         // print("여기");
+//                         // debugPrint(polylines.toString());
+//                       } else if (latLng.length > 2) {
+//                         distance = 0;
+//                         latLng = [];
+//                       }
+//                     });
+//                   }
+//                 } catch (e) {
+//                   print("setState 에러 $e");
+//                 }

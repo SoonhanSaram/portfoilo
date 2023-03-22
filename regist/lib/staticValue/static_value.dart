@@ -8,8 +8,7 @@ class StaticValues {
   static const String passwordTextField = "비밀번호를 입력해주세요";
   static const String emailTextField = "이메일을 입력해주세요";
   static const String googleScopeEmail = "email";
-  static const String googleScopeAddr =
-      "https://www.googleapis.com/auth/contacts.readonly";
+  static const String googleScopeAddr = "https://www.googleapis.com/auth/contacts.readonly";
   static const int backGroundColor = 0xFF2186D1;
   static const String mainPageTitle1 = '예약하러 가기';
   static const String mainPageTitle2 = "예약정보 확인";
@@ -29,4 +28,7 @@ class StaticValues {
   static const String option4 = "승합차";
   static const String cancel = "취소";
   static const String save = "확인";
+  static const String baseUrl = "https://maps.googleapis.com/maps/api/directions/json?";
+  static const String markerOrigin = "출발지";
+  static const String markerDestination = "도착지";
 }
