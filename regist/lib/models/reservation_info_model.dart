@@ -1,5 +1,5 @@
-class ReselInfo {
-  ReselInfo({
+class ReserInfo {
+  ReserInfo({
     required this.user,
     this.sdate = "",
     this.stime = "",
@@ -31,7 +31,7 @@ class ReselInfo {
   int status;
 
   // Firebase 에 입력하기 위한 직렬화(serialization)
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMapSave({required sdate, required stime, required status}) {
     return {
       'user': user,
       'sdate': sdate,
@@ -47,7 +47,7 @@ class ReselInfo {
     };
   }
 
-  factory ReselInfo.fromMap(Map<String, dynamic> json) => ReselInfo(
+  factory ReserInfo.fromMap(Map<String, dynamic> json) => ReserInfo(
         user: json['user'],
         sdate: json['sdate'],
         edate: json['edate'],

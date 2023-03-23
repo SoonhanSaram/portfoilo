@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:regist/models/reselvation_info_model.dart';
+import 'package:regist/models/reservation_info_model.dart';
 
 /*
  * extends 와 with 의 차이
@@ -10,10 +10,10 @@ import 'package:regist/models/reselvation_info_model.dart';
  */
 
 class LoginViewModel with ChangeNotifier {
-  ReselInfo? reselInfo;
+  ReserInfo? reselInfo;
 
   LoginViewModel() {
-    reselInfo = ReselInfo(user: "");
+    reselInfo = ReserInfo(user: "");
   }
 
   User? auth;
@@ -44,10 +44,8 @@ class LoginViewModel with ChangeNotifier {
         reselInfo?.user = currentUser!.displayName.toString();
       }
 
-      final GoogleSignInAuthentication? googleAuth =
-          await currentUser?.authentication;
-      final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
+      final GoogleSignInAuthentication? googleAuth = await currentUser?.authentication;
+      final credential = GoogleAuthProvider.credential(accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
 
       notifyListeners();
     } catch (e) {

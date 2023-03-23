@@ -11,7 +11,6 @@ import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/models/directions_model.dart';
 import 'package:regist/result_page.dart';
-import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 
@@ -38,8 +37,7 @@ class MapSampleState extends State<Maps> {
   CameraPosition? _kGooglePlex;
   final List<Marker> _marker = [];
   double distance = 0;
-  final CameraPosition _exeception =
-      const CameraPosition(target: LatLng(37.3512, 126.5834), zoom: 17.5);
+  final CameraPosition _exeception = const CameraPosition(target: LatLng(37.3512, 126.5834), zoom: 17.5);
 
   String? postCode;
   String address = "";
@@ -100,8 +98,7 @@ class MapSampleState extends State<Maps> {
     final double centerLon = (lon1 + lon2) / 2;
     final LatLng center = LatLng(centerLat, centerLon);
     final GoogleMapController mapController = await _controller.future;
-    final CameraPosition cameraPosition =
-        CameraPosition(target: center, zoom: 10);
+    final CameraPosition cameraPosition = CameraPosition(target: center, zoom: 10);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
@@ -127,12 +124,10 @@ class MapSampleState extends State<Maps> {
     Timer(const Duration(seconds: 1), () {
       Location.instance.onLocationChanged.listen(
         (LocationData currentLocation) {
-          if (currentLocation.latitude != null &&
-              currentLocation.longitude != null) {
+          if (currentLocation.latitude != null && currentLocation.longitude != null) {
             setState(
               () {
-                _latLng = LatLng(
-                    currentLocation.latitude!, currentLocation.longitude!);
+                _latLng = LatLng(currentLocation.latitude!, currentLocation.longitude!);
 
                 _kGooglePlex = CameraPosition(
                   target: _latLng!,
@@ -168,22 +163,20 @@ class MapSampleState extends State<Maps> {
     super.dispose();
   }
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   final List<Marker> markers = [];
   final List<String> _location = [];
   // directions 사용하기 위한 addMarker 함수
-  Future<void> addMarker(
-      String location, LatLng pos, BookedViewModel bookedViewModel) async {
+  Future<void> addMarker(String location, LatLng pos, BookedViewModel bookedViewModel) async {
     if (_origin == null || (_origin != null && _destination != null)) {
       setState(() {
         _location.add(location);
         _origin = Marker(
           markerId: MarkerId(
-            dotenv.env["MAKER_ORIGIN"]!,
+            dotenv.env["MARKER_ORIGIN"]!,
           ),
-          infoWindow: InfoWindow(title: dotenv.env["MAKER_ORIGIN"]!),
+          infoWindow: InfoWindow(title: dotenv.env["MARKER_ORIGIN"]!),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
           position: pos,
         );
@@ -195,9 +188,9 @@ class MapSampleState extends State<Maps> {
       setState(() {
         _destination = Marker(
           markerId: MarkerId(
-            dotenv.env["MAKER_DESTINATION"]!,
+            dotenv.env["MARKER_DESTINATION"]!,
           ),
-          infoWindow: InfoWindow(title: dotenv.env["MAKER_DESTINATION"]!),
+          infoWindow: InfoWindow(title: dotenv.env["MARKER_DESTINATION"]!),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           position: pos,
         );
@@ -248,9 +241,7 @@ class MapSampleState extends State<Maps> {
                   polylineId: const PolylineId("overview_polyline"),
                   color: Colors.red,
                   width: 3,
-                  points: _info!.polylinePoints
-                      .map((e) => LatLng(e.latitude, e.longitude))
-                      .toList(),
+                  points: _info!.polylinePoints.map((e) => LatLng(e.latitude, e.longitude)).toList(),
                 )
             },
             markers: {
@@ -334,11 +325,9 @@ class MapSampleState extends State<Maps> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
+                            borderRadius: const BorderRadius.all(Radius.circular(8)),
                           ),
-                          child:
-                              Text("목적지까지 ${distance.toStringAsFixed(2)} KM"),
+                          child: Text("목적지까지 ${distance.toStringAsFixed(2)} KM"),
                         ),
                       ],
                     ),
@@ -375,8 +364,7 @@ class MapSampleState extends State<Maps> {
                 latitude = result.latitude!.toString();
                 longitude = result.longitude!.toString();
                 searchedPosition = LatLng(result.latitude!, result.longitude!);
-                _mapController
-                    .animateCamera(CameraUpdate.newLatLng(searchedPosition));
+                _mapController.animateCamera(CameraUpdate.newLatLng(searchedPosition));
 
                 controller.text = address;
                 addMarker(address, searchedPosition, bookedViewModel);
@@ -400,12 +388,10 @@ class MapSampleState extends State<Maps> {
     );
   }
 
-  TextButton completeButton(
-      BuildContext context, BookedViewModel bookedViewModel) {
+  TextButton completeButton(BuildContext context, BookedViewModel bookedViewModel) {
     return TextButton(
       onPressed: () {
-        if (_startController.text.isEmpty != true &&
-            _destinationController.text.isEmpty != true) {
+        if (_startController.text.isEmpty != true && _destinationController.text.isEmpty != true) {
           bookedViewModel.from = _startController.text;
           bookedViewModel.destination = _destinationController.text;
           bookedViewModel.fare();
@@ -451,21 +437,14 @@ void _showBottomSheet(BuildContext context, BookedViewModel bookedViewModel) {
     context: context,
     builder: (BuildContext context) {
       return ConstrainedBox(
-        constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height * 0.35,
-            maxHeight: MediaQuery.of(context).size.height * 0.35),
+        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.35, maxHeight: MediaQuery.of(context).size.height * 0.35),
         child: ListView.builder(
           itemCount: 5,
           itemBuilder: (context, i) {
             var fee = [];
             var titles = [];
             fee.addAll(
-              [
-                bookedViewModel.sedanRentFee,
-                bookedViewModel.suvRentFee,
-                bookedViewModel.limousineRentFee,
-                "0000"
-              ],
+              [bookedViewModel.sedanRentFee, bookedViewModel.suvRentFee, bookedViewModel.limousineRentFee, "0000"],
             );
             titles.addAll(
               [

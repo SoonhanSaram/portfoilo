@@ -21,8 +21,8 @@
 
 ## 수정&추가해야 할 부분
 
-- maps 진입 시 null check
-- 출발지 도착지 거리 및 polyline 출력 = done
+- maps 진입 시 null check - done
+- 출발지 도착지 거리 및 polyline 출력 - 했으나 정확한 route 는 direction api 가 한국 주소를 지원하지 않음 03-23일에 routes api 로 교체
 - 예약 확인 화면
 - 예약 정보 화면에서 예약 데이터 출력
 
