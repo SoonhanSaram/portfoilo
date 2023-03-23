@@ -20,29 +20,33 @@ class Directions {
       throw Exception();
     }
 
-    final data = Map<String, dynamic>.from(map["routes"][0]);
+    final data = Map<String, dynamic>.from(map['routes'][0]);
 
-    final northeast = data['bounds']['northest'];
+    final northeast = data['bounds']['northeast'];
     final southwest = data['bounds']['southwest'];
     final bounds = LatLngBounds(
-      southwest: LatLng(southwest['lat'], southwest["lng"]),
+      southwest: LatLng(
+        southwest['lat'],
+        southwest['lng'],
+      ),
       northeast: LatLng(
-        northeast["lat"],
-        northeast["lng"],
+        northeast['lat'],
+        northeast['lng'],
       ),
     );
 
     String distance = "";
     String duration = "";
-    if ((data["legs"] as List).isNotEmpty) {
-      final leg = data["legs"][0];
-      distance = leg["distance"]["text"];
-      duration = leg["duration"]["text"];
+    if ((data['legs'] as List).isNotEmpty) {
+      final leg = data['legs'][0];
+      distance = leg['distance']['text'];
+      duration = leg['duration']['text'];
     }
 
     return Directions(
       bounds: bounds,
-      polylinePoints: PolylinePoints().decodePolyline(data["overview_polyline"]["points"]),
+      polylinePoints:
+          PolylinePoints().decodePolyline(data['overview_polyline']['points']),
       totalDistance: distance,
       totlaDuration: duration,
     );

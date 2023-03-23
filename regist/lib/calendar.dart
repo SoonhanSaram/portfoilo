@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/staticValue/static_value.dart';
@@ -75,9 +76,9 @@ class _CalendarState extends State<Calendar> {
                       children: [
                         Column(
                           children: [
-                            const Text(
-                              StaticValues.timePicker,
-                              style: TextStyle(
+                            Text(
+                              dotenv.env["TIME_PICKER"]!,
+                              style: const TextStyle(
                                   fontSize: 26, fontWeight: FontWeight.w900),
                             ),
                             Padding(
@@ -103,9 +104,9 @@ class _CalendarState extends State<Calendar> {
                             ),
                             TextButton(
                               onPressed: () => uiMdules.toMaps(context),
-                              child: const Text(
-                                StaticValues.timePickerButton,
-                                style: TextStyle(
+                              child: Text(
+                                dotenv.env["TIME_PICKER_BUTTON"]!,
+                                style: const TextStyle(
                                   fontSize: 24,
                                 ),
                               ),

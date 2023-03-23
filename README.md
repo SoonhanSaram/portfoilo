@@ -1,5 +1,10 @@
 # regist
 
+## 프로젝트 생성
+
+- `flutter create 프로젝트명`
+- `flutter create --org=com.kyoungmin movv` : com.kyoungmin.movv
+
 ## 간단한 정보들만 취합한 예약 시스템
 
 - 구글 로그인을 통해서 예약 화면에 진입
@@ -17,6 +22,11 @@
 ## 수정&추가해야 할 부분
 
 - maps 진입 시 null check
-- 출발지 도착지 거리 및 polyline 출력
+- 출발지 도착지 거리 및 polyline 출력 = done
 - 예약 확인 화면
 - 예약 정보 화면에서 예약 데이터 출력
+
+## 카카오 API 키 해시 발급 받는 법
+
+- android Studio\jre\bin 에서
+  `./keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore -storepass android keypass android | openssl sha1 -binary | openssl base64 `

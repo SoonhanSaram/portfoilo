@@ -1,14 +1,15 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import "package:flutter/material.dart";
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
-import 'package:regist/dao/directions_respository.dart';
-import 'package:regist/models/directions.model.dart';
+import 'package:regist/models/directions_model.dart';
 import 'package:regist/result_page.dart';
 import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
@@ -25,7 +26,7 @@ class MapSampleState extends State<Maps> {
   Marker? _origin;
   Marker? _destination;
   Directions? _info;
-
+  Double? _distance;
   late double lat1;
   late double lng1;
   late double lat2;
@@ -37,7 +38,8 @@ class MapSampleState extends State<Maps> {
   CameraPosition? _kGooglePlex;
   final List<Marker> _marker = [];
   double distance = 0;
-  final CameraPosition _exeception = const CameraPosition(target: LatLng(37.3512, 126.5834), zoom: 17.5);
+  final CameraPosition _exeception =
+      const CameraPosition(target: LatLng(37.3512, 126.5834), zoom: 17.5);
 
   String? postCode;
   String address = "";
@@ -90,14 +92,17 @@ class MapSampleState extends State<Maps> {
       southwest: latLng[0],
       northeast: latLng[1],
     );
-
+    final double lat1 = latLng[0].latitude;
+    final double lon1 = latLng[0].longitude;
+    final double lat2 = latLng[1].latitude;
+    final double lon2 = latLng[1].longitude;
+    final double centerLat = (lat1 + lat2) / 2;
+    final double centerLon = (lon1 + lon2) / 2;
+    final LatLng center = LatLng(centerLat, centerLon);
     final GoogleMapController mapController = await _controller.future;
-    mapController.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        bounds,
-        50,
-      ),
-    );
+    final CameraPosition cameraPosition =
+        CameraPosition(target: center, zoom: 10);
+    mapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   Future<void> getperMission() async {
@@ -122,10 +127,12 @@ class MapSampleState extends State<Maps> {
     Timer(const Duration(seconds: 1), () {
       Location.instance.onLocationChanged.listen(
         (LocationData currentLocation) {
-          if (currentLocation.latitude != null && currentLocation.longitude != null) {
+          if (currentLocation.latitude != null &&
+              currentLocation.longitude != null) {
             setState(
               () {
-                _latLng = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+                _latLng = LatLng(
+                    currentLocation.latitude!, currentLocation.longitude!);
 
                 _kGooglePlex = CameraPosition(
                   target: _latLng!,
@@ -161,20 +168,22 @@ class MapSampleState extends State<Maps> {
     super.dispose();
   }
 
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
   final List<Marker> markers = [];
   final List<String> _location = [];
   // directions 사용하기 위한 addMarker 함수
-  Future<void> addMarker(String location, LatLng pos) async {
+  Future<void> addMarker(
+      String location, LatLng pos, BookedViewModel bookedViewModel) async {
     if (_origin == null || (_origin != null && _destination != null)) {
       setState(() {
         _location.add(location);
         _origin = Marker(
-          markerId: const MarkerId(
-            StaticValues.markerOrigin,
+          markerId: MarkerId(
+            dotenv.env["MAKER_ORIGIN"]!,
           ),
-          infoWindow: const InfoWindow(title: StaticValues.markerOrigin),
+          infoWindow: InfoWindow(title: dotenv.env["MAKER_ORIGIN"]!),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
           position: pos,
         );
@@ -185,21 +194,21 @@ class MapSampleState extends State<Maps> {
       _location.add(location);
       setState(() {
         _destination = Marker(
-          markerId: const MarkerId(
-            StaticValues.markerDestination,
+          markerId: MarkerId(
+            dotenv.env["MAKER_DESTINATION"]!,
           ),
-          infoWindow: const InfoWindow(title: StaticValues.markerDestination),
+          infoWindow: InfoWindow(title: dotenv.env["MAKER_DESTINATION"]!),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           position: pos,
         );
       });
       print("위치정보 ${_location[0]}, ${_location[1]}");
-      final directions = await DirectionsRepository().getDirections(
+      final directions = await bookedViewModel.fetchDirections(
         origin: _origin!.position,
         destination: pos,
       );
       print("여기");
-      setState(() => _info = directions);
+      setState(() => _info = bookedViewModel.directions);
     }
   }
 
@@ -228,6 +237,7 @@ class MapSampleState extends State<Maps> {
   @override
   Widget build(BuildContext context) {
     var bookedViewModel = context.watch<BookedViewModel>();
+    double? distance = context.read<BookedViewModel>().calDistance;
     return Scaffold(
       body: Stack(
         children: [
@@ -238,7 +248,9 @@ class MapSampleState extends State<Maps> {
                   polylineId: const PolylineId("overview_polyline"),
                   color: Colors.red,
                   width: 3,
-                  points: _info!.polylinePoints.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+                  points: _info!.polylinePoints
+                      .map((e) => LatLng(e.latitude, e.longitude))
+                      .toList(),
                 )
             },
             markers: {
@@ -251,11 +263,12 @@ class MapSampleState extends State<Maps> {
             mapType: MapType.normal,
             initialCameraPosition: _kGooglePlex!,
             onMapCreated: (GoogleMapController controller) async {
+              _controller.complete(controller);
+
               setState(() {
                 _mapController = controller;
               });
-              if (latLng.length == 2) {
-                _controller.complete(controller);
+              if (latLng.length >= 2) {
                 _fitBounds();
               }
             },
@@ -276,7 +289,7 @@ class MapSampleState extends State<Maps> {
                     children: [
                       searchBox(
                         context: context,
-                        label: StaticValues.mapSearchBox1,
+                        label: dotenv.env["MAP_SEARCH_BOX1"]!,
                         location: locationOrigin,
                         locationOrigin: locationOrigin,
                         locationDestination: locationDestination,
@@ -287,7 +300,7 @@ class MapSampleState extends State<Maps> {
                       const SizedBox(height: 10),
                       searchBox(
                         context: context,
-                        label: StaticValues.mapSearchBox2,
+                        label: dotenv.env["MAP_SEARCH_BOX2"]!,
                         location: locationDestination,
                         locationDestination: locationDestination,
                         locationOrigin: locationOrigin,
@@ -307,21 +320,28 @@ class MapSampleState extends State<Maps> {
               ],
             ),
           ),
-          distance.isFinite == true && distance > 0
-              ? Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 1),
-                          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          distance?.isFinite == true && distance! > 0
+              ? Positioned(
+                  bottom: MediaQuery.of(context).size.height * 0.25,
+                  left: 0,
+                  right: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child:
+                              Text("목적지까지 ${distance.toStringAsFixed(2)} KM"),
                         ),
-                        child: Text("$distance KM"),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 )
               : Container(),
@@ -355,12 +375,14 @@ class MapSampleState extends State<Maps> {
                 latitude = result.latitude!.toString();
                 longitude = result.longitude!.toString();
                 searchedPosition = LatLng(result.latitude!, result.longitude!);
-                _mapController.animateCamera(CameraUpdate.newLatLng(searchedPosition));
+                _mapController
+                    .animateCamera(CameraUpdate.newLatLng(searchedPosition));
 
                 controller.text = address;
-                latLng.add(searchedPosition);
-
-                addMarker(address, searchedPosition);
+                addMarker(address, searchedPosition, bookedViewModel);
+                setState(() {
+                  latLng.add(searchedPosition);
+                });
               },
             ),
           ),
@@ -378,22 +400,26 @@ class MapSampleState extends State<Maps> {
     );
   }
 
-  TextButton completeButton(BuildContext context, BookedViewModel bookedViewModel) {
+  TextButton completeButton(
+      BuildContext context, BookedViewModel bookedViewModel) {
     return TextButton(
       onPressed: () {
-        if (_startController.text.isEmpty != true && _destinationController.text.isEmpty != true) {
+        if (_startController.text.isEmpty != true &&
+            _destinationController.text.isEmpty != true) {
+          bookedViewModel.from = _startController.text;
+          bookedViewModel.destination = _destinationController.text;
+          bookedViewModel.fare();
           _showBottomSheet(context, bookedViewModel);
-          // print("${bookedViewModel.from}, ${bookedViewModel.destination}");
         } else if (_startController.text.isEmpty == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(StaticValues.warningMessage1),
+            SnackBar(
+              content: Text(dotenv.env["WARNING_MESSAGE1"]!),
             ),
           );
         } else if (_destinationController.text.isEmpty == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(StaticValues.warningMessage2),
+            SnackBar(
+              content: Text(dotenv.env["WARING_MESSAGE2"]!),
             ),
           );
         }
@@ -403,7 +429,7 @@ class MapSampleState extends State<Maps> {
       ),
       child: const Text(
         "다음",
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(fontSize: 18, color: Colors.white),
       ),
     );
   }
@@ -424,89 +450,71 @@ void _showBottomSheet(BuildContext context, BookedViewModel bookedViewModel) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.car_rental_outlined),
-            trailing: const Text(
-              "00000원",
-              style: TextStyle(fontSize: 36),
-            ),
-            title: const Text(
-              StaticValues.option1,
-              style: TextStyle(fontSize: 36),
-            ),
-            onTap: () {
-              bookedViewModel.transport = StaticValues.option1;
-              bookedViewModel.fee = "00000";
-              toResult(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.car_rental),
-            trailing: const Text(
-              "00000원",
-              style: TextStyle(fontSize: 36),
-            ),
-            title: const Text(
-              StaticValues.option2,
-              style: TextStyle(fontSize: 36),
-            ),
-            onTap: () {
-              bookedViewModel.transport = StaticValues.option2;
-              bookedViewModel.fee = "00000";
-              toResult(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.car_rental_outlined),
-            trailing: const Text(
-              "00000원",
-              style: TextStyle(fontSize: 36),
-            ),
-            title: const Text(
-              StaticValues.option3,
-              style: TextStyle(fontSize: 36),
-            ),
-            onTap: () {
-              bookedViewModel.transport = StaticValues.option3;
-              bookedViewModel.fee = "00000";
-              toResult(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.car_rental_sharp),
-            trailing: const Text(
-              "00000원",
-              style: TextStyle(fontSize: 36),
-            ),
-            title: const Text(
-              StaticValues.option4,
-              style: TextStyle(fontSize: 36),
-            ),
-            onTap: () {
-              bookedViewModel.transport = StaticValues.option4;
-              bookedViewModel.fee = "00000";
-              toResult(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.cancel),
-            title: const Text(
-              StaticValues.cancel,
-              style: TextStyle(fontSize: 36),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
+      return ConstrainedBox(
+        constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height * 0.35,
+            maxHeight: MediaQuery.of(context).size.height * 0.35),
+        child: ListView.builder(
+          itemCount: 5,
+          itemBuilder: (context, i) {
+            var fee = [];
+            var titles = [];
+            fee.addAll(
+              [
+                bookedViewModel.sedanRentFee,
+                bookedViewModel.suvRentFee,
+                bookedViewModel.limousineRentFee,
+                "0000"
+              ],
+            );
+            titles.addAll(
+              [
+                dotenv.env["OPTION1"]!,
+                dotenv.env["OPTION2"]!,
+                dotenv.env["OPTION3"]!,
+                dotenv.env["OPTION4"]!,
+              ],
+            );
+            if (i <= 3) {
+              return ListTile(
+                onTap: () => {
+                  bookedViewModel.transport = titles[i],
+                  bookedViewModel.fee = fee[i],
+                  toResult(context),
+                },
+                leading: const Icon(
+                  Icons.car_rental,
+                  size: 50,
+                ),
+                title: Text(
+                  titles[i],
+                  style: const TextStyle(fontSize: 24),
+                ),
+                trailing: Text(
+                  "${fee[i]}원",
+                  style: const TextStyle(fontSize: 24),
+                ),
+              );
+            }
+            return ListTile(
+              onTap: () => {
+                Navigator.pop(context),
+              },
+              leading: const Icon(
+                Icons.cancel,
+                size: 50,
+              ),
+              title: Text(
+                dotenv.env["CANCEL"]!,
+                style: const TextStyle(fontSize: 24),
+              ),
+            );
+          },
+        ),
       );
     },
   );
 }
-
 
 // try {
 //                   if (_startController.text.isNotEmpty && _destinationController.text.isNotEmpty) {
@@ -529,10 +537,7 @@ void _showBottomSheet(BuildContext context, BookedViewModel bookedViewModel) {
 //                           print(e);
 //                         }
 
-//                         lat1 = double.parse(locationArr[0][1]);
-//                         lng1 = double.parse(locationArr[0][3]);
-//                         lat2 = double.parse(locationArr[1][1]);
-//                         lng2 = double.parse(locationArr[1][3]);
+//
 //                         distance += uiModules.distance(lat1, lng1, lat2, lng2);
 
 //                         // getPolylines(_startController, _destinationController);

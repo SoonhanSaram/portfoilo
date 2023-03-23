@@ -53,6 +53,8 @@ dependencies:
   location: ^4.4.0
   google_directions_api: ^0.9.1
   dio: ^5.0.3
+  firebase_database: ^10.0.16
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:

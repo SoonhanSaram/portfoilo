@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:regist/models/reselvation_info.dart';
+import 'package:regist/models/reselvation_info_model.dart';
 
 /*
  * extends 와 with 의 차이

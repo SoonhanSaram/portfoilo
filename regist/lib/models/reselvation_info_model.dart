@@ -12,6 +12,7 @@ class ReselInfo {
     this.fee = "",
     this.edate = "",
     this.etime = "",
+    this.status = 0,
   });
 
   String user;
@@ -27,6 +28,7 @@ class ReselInfo {
   String fee;
   String edate;
   String etime;
+  int status;
 
   // Firebase 에 입력하기 위한 직렬화(serialization)
   Map<String, dynamic> toMap() {
@@ -41,6 +43,7 @@ class ReselInfo {
       'fee': fee,
       'edate': edate,
       'etime': etime,
+      'status': status,
     };
   }
 
@@ -54,5 +57,6 @@ class ReselInfo {
         transport: json['sdate'],
         people: json['people'],
         fee: json['fee'],
+        status: json['status'],
       );
 }

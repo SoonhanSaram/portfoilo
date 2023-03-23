@@ -12,8 +12,9 @@
         android:icon="@mipmap/ic_launcher">
         <meta-data              
                  android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyAH9G_8q4nt0GAEEtmdHbPepjzzj_UNsnE"
+                android:value="${dotenv.env["MAPS_API_KEY"]!}"
             />
+        <meta-data android:name="com.kakao.sdk.AppKey" android:value="dadf3c889669b355dca58b98e98911d3"/>            
         <activity
             
             android:name=".MainActivity"

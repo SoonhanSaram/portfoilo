@@ -1,16 +1,19 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/membership_regist.dart';
 import 'package:regist/menu_page.dart';
-import 'package:regist/models/reselvation_info.dart';
+import 'package:regist/models/reselvation_info_model.dart';
 import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
 
 void main() async {
+  await dotenv.load(fileName: 'assets/config/.env');
   WidgetsFlutterBinding.ensureInitialized();
-
+  FirebaseDatabase database = FirebaseDatabase.instance;
   // await Future.delayed(const Duration(seconds: 3));
   await Firebase.initializeApp();
   runApp(
@@ -42,7 +45,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: StaticValues.title,
+      title: dotenv.env["TITLE"]!,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
       home: const HomePage(),
     );
@@ -56,7 +59,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(StaticValues.title),
+        title: Text(dotenv.env["TITLE"]!),
       ),
       body: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
@@ -77,12 +80,12 @@ _buildBody(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        const Flexible(
+        Flexible(
           fit: FlexFit.loose,
           flex: 2,
           child: Text(
-            StaticValues.pageTitle,
-            style: TextStyle(
+            dotenv.env["PAGE_TITLE"]!,
+            style: const TextStyle(
                 fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
           ),
         ),
@@ -92,11 +95,11 @@ _buildBody(BuildContext context) {
           child: Column(
             children: [
               inputBox(
-                  labelText: StaticValues.emailTextField,
+                  labelText: dotenv.env["EMAIL_TEXT_FIELD"]!,
                   keyboardType: TextInputType.emailAddress,
                   onChange: (value) => {
                         loginViewModel.changeUpdateValue(
-                          StaticValues.googleScopeEmail,
+                          dotenv.env["GOOGLE_SCOPE_EMAIL"]!,
                           value,
                         )
                       }),
@@ -104,12 +107,12 @@ _buildBody(BuildContext context) {
                 height: 20,
               ),
               inputBox(
-                  labelText: StaticValues.passwordTextField,
+                  labelText: dotenv.env["PASSWORD_TEXT_FIELD"]!,
                   obscureText: true,
                   keyboardType: TextInputType.text,
                   onChange: (value) => {
                         loginViewModel.changeUpdateValue(
-                          StaticValues.statePassword,
+                          dotenv.env["STATE_PASSWPRD"]!,
                           value,
                         )
                       }),
@@ -117,9 +120,9 @@ _buildBody(BuildContext context) {
                   onPressed: () async {
                     await loginViewModel.login(context);
                   },
-                  child: const Text(
-                    StaticValues.loginButtonTitle,
-                    style: TextStyle(fontSize: 24),
+                  child: Text(
+                    dotenv.env["LOGIN_BUTTON_TITLE"]!,
+                    style: const TextStyle(fontSize: 24),
                   )),
             ],
           ),
@@ -144,7 +147,7 @@ _buildBody(BuildContext context) {
                         MaterialPageRoute(
                             builder: (context) => const EmailRegist()));
                   },
-                  child: const Text(StaticValues.joinButtonTitle),
+                  child: Text(dotenv.env["JOIN_BUTTON_TITLE"]!),
                 ),
                 loginButton(loginViewModel, context),
               ],
@@ -180,11 +183,11 @@ GestureDetector loginButton(
             )),
         Container(
           color: const Color(0xFF4285F4),
-          child: const Padding(
-            padding: EdgeInsets.all(8.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Text(
-              StaticValues.imageButtonTitle,
-              style: TextStyle(color: Colors.white),
+              dotenv.env["IMAGE_BUTTON_TITLE"]!,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         )

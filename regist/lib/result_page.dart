@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
@@ -34,9 +35,9 @@ class ResultPage extends StatelessWidget {
                 children: [
                   TextButton(
                     onPressed: () {},
-                    child: const Text(
-                      StaticValues.cancel,
-                      style: TextStyle(fontSize: 24),
+                    child: Text(
+                      dotenv.env["CANCEL"]!,
+                      style: const TextStyle(fontSize: 24),
                     ),
                   ),
                   SizedBox(
@@ -44,9 +45,9 @@ class ResultPage extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: const Text(
-                      StaticValues.save,
-                      style: TextStyle(fontSize: 24),
+                    child: Text(
+                      dotenv.env["SAVE"]!,
+                      style: const TextStyle(fontSize: 24),
                     ),
                   ),
                 ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
@@ -31,14 +31,14 @@ class MenuPage extends StatelessWidget {
             children: [
               reselvationButton(
                 context,
-                StaticValues.mainPageTitle1,
+                dotenv.env["MAIN_PAGE_TITLE1"]!,
                 () => uiModules.toCalendar(context),
               ),
-              reselvationButton(context, StaticValues.mainPageTitle2,
+              reselvationButton(context, dotenv.env["MAIN_PAGE_TITLE2"]!,
                   () => uiModules.toCalendar(context)),
-              reselvationButton(context, StaticValues.mainMessage,
+              reselvationButton(context, dotenv.env["MAIN_MESSAGE"]!,
                   () => uiModules.toCalendar(context)),
-              reselvationButton(context, StaticValues.mainAlarm,
+              reselvationButton(context, dotenv.env["MAIN_ALARM"]!,
                   () => uiModules.toCalendar(context)),
             ],
           ),
@@ -51,7 +51,7 @@ class MenuPage extends StatelessWidget {
             width: double.infinity,
             child: reselvationButton(
               context,
-              StaticValues.logoutButton,
+              dotenv.env["LOGOUT_BUTTON"]!,
               () => loginViewModel.logout(context),
             ),
           ),
@@ -71,7 +71,7 @@ class MenuPage extends StatelessWidget {
         width: 150,
         height: 150,
         decoration: BoxDecoration(
-          color: const Color(StaticValues.backGroundColor),
+          color: Color(int.parse(dotenv.env["BACKGROUND_COLOR"]!)),
           borderRadius: BorderRadius.circular(16.0), // Container의 모서리를 둥글게 설정
         ),
         child: Column(
