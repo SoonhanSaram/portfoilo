@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 
@@ -8,7 +9,11 @@ class ReservationConfirmationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var bookedViewModel = context.watch<BookedViewModel>();
-    
-    return ListView.builder(itemBuilder:);
+
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(dotenv.env["CONFIRM_PAGE_TITLE"]!),
+        ),
+        body: const Text("예약정보 확인화면"));
   }
 }

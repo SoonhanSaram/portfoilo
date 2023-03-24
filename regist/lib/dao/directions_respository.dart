@@ -8,14 +8,15 @@ class DirectionsRepository {
 
   DirectionsRepository({Dio? dio}) : _dio = dio ?? Dio();
 
-  Future<Directions> getDirections({required LatLng origin, required LatLng destination}) async {
+  Future<Directions> getDirections(
+      {required LatLng origin, required LatLng destination}) async {
     final response = await _dio.get(
       dotenv.env['BASEURL']!,
       queryParameters: {
         'origin': "${origin.latitude},${origin.longitude}",
         'destination': "${destination.latitude},${destination.longitude}",
         'mode': "transit",
-        'key': "AIzaSyBQ2IVl9B95UTTomzQMbnu0jbpngA3Za4s",
+        'key': dotenv.env["DIRECTIONS_API_KEY"]!,
       },
     );
 

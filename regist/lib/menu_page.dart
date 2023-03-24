@@ -34,8 +34,13 @@ class MenuPage extends StatelessWidget {
                 dotenv.env["MAIN_PAGE_TITLE1"]!,
                 () => uiModules.toCalendar(context),
               ),
-              reselvationButton(context, dotenv.env["MAIN_PAGE_TITLE2"]!,
-                  () => uiModules.toCalendar(context)),
+              reselvationButton(
+                  context,
+                  dotenv.env["MAIN_PAGE_TITLE2"]!,
+                  () => {
+                        bookedViewModel.getInfoFunc(user: bookedViewModel.user),
+                        uiModules.toConfirmPage(context),
+                      }),
               reselvationButton(context, dotenv.env["MAIN_MESSAGE"]!,
                   () => uiModules.toCalendar(context)),
               reselvationButton(context, dotenv.env["MAIN_ALARM"]!,
