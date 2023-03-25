@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
 
@@ -12,7 +11,7 @@ class MenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var loginViewModel = context.watch<LoginViewModel>();
     var bookedViewModel = context.watch<BookedViewModel>();
-    UiModules uiModules = UiModules();
+
     return Column(
       children: [
         Text(
@@ -31,20 +30,27 @@ class MenuPage extends StatelessWidget {
             children: [
               reselvationButton(
                 context,
-                dotenv.env["MAIN_PAGE_TITLE1"]!,
-                () => uiModules.toCalendar(context),
+                dotenv.env["MAIN_PAGE_TITLE1"] ?? "",
+                () {},
               ),
               reselvationButton(
                   context,
-                  dotenv.env["MAIN_PAGE_TITLE2"]!,
+                  dotenv.env["MAIN_PAGE_TITLE2"] ?? "",
                   () => {
+                        bookedViewModel.fare(),
                         bookedViewModel.getInfoFunc(user: bookedViewModel.user),
-                        uiModules.toConfirmPage(context),
+                        () {},
                       }),
-              reselvationButton(context, dotenv.env["MAIN_MESSAGE"]!,
-                  () => uiModules.toCalendar(context)),
-              reselvationButton(context, dotenv.env["MAIN_ALARM"]!,
-                  () => uiModules.toCalendar(context)),
+              reselvationButton(
+                context,
+                dotenv.env["MAIN_MESSAGE"] ?? "",
+                () {},
+              ),
+              reselvationButton(
+                context,
+                dotenv.env["MAIN_ALARM"] ?? "",
+                () {},
+              ),
             ],
           ),
         ),

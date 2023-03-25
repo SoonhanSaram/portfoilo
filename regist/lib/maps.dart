@@ -443,9 +443,9 @@ void _showBottomSheet(BuildContext context, BookedViewModel bookedViewModel) {
           itemBuilder: (context, i) {
             var fee = [];
             var titles = [];
-            fee.addAll(
-              [bookedViewModel.sedanRentFee, bookedViewModel.suvRentFee, bookedViewModel.limousineRentFee, "0000"],
-            );
+            // fee.addAll(
+            // [bookedViewModel.sedanRentFee, bookedViewModel.suvRentFee, bookedViewModel.limousineRentFee, "0000"],
+            // );
             titles.addAll(
               [
                 dotenv.env["OPTION1"]!,
