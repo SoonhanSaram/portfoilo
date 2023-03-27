@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
-import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 
@@ -52,8 +51,8 @@ class _CalendarState extends State<Calendar> {
               () {
                 this.selectedDay = selectedDay;
                 this.focusedDay = focusedDay;
-                bookedViewModel.resDate =
-                    selectedDay.toString().substring(0, 10);
+                bookedViewModel.resDate = selectedDay.toString().substring(0, 10);
+                print(bookedViewModel.resDate);
               },
             );
           },
@@ -69,23 +68,19 @@ class _CalendarState extends State<Calendar> {
               builder: (context) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * 0.35,
-                        maxHeight: MediaQuery.of(context).size.height * 0.35),
+                    constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.35, maxHeight: MediaQuery.of(context).size.height * 0.35),
                     child: Stack(
                       children: [
                         Column(
                           children: [
                             Text(
                               dotenv.env["TIME_PICKER"]!,
-                              style: const TextStyle(
-                                  fontSize: 26, fontWeight: FontWeight.w900),
+                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TimePickerSpinner(
-                                highlightedTextStyle: const TextStyle(
-                                    color: Colors.black, fontSize: 36),
+                                highlightedTextStyle: const TextStyle(color: Colors.black, fontSize: 36),
                                 time: DateTime.utc(0, 0, 0, 0, 0, 0),
                                 is24HourMode: true,
                                 isForce2Digits: true,
@@ -94,9 +89,8 @@ class _CalendarState extends State<Calendar> {
                                     () {
                                       selectedHours = time.hour;
                                       selectedMinutes = time.minute;
-
-                                      bookedViewModel.resTime =
-                                          ("$selectedHours시 : $selectedMinutes분");
+                                      bookedViewModel.resTime = ("$selectedHours시 : $selectedMinutes분");
+                                      print(bookedViewModel.resTime);
                                     },
                                   );
                                 },

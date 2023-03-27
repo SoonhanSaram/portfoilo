@@ -12,7 +12,7 @@ class ReservationConfirmationPage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(dotenv.env["CONFIRM_PAGE_TITLE"]!),
+          title: const Text("예약정보 확인 화면"),
         ),
         body: const Text("예약정보 확인화면"));
   }

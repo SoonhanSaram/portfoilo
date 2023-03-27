@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:regist/calendar.dart';
+import 'package:regist/reservation_confirmation_page.dart';
+import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
 
@@ -11,7 +14,29 @@ class MenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var loginViewModel = context.watch<LoginViewModel>();
     var bookedViewModel = context.watch<BookedViewModel>();
+    var uiModule = UiModules();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(dotenv.env["TITLE"]!),
+      ),
+      body: ConstrainedBox(constraints: const BoxConstraints.expand(), child: menu_body(loginViewModel, context, uiModule, bookedViewModel)),
+      drawer: Drawer(
+        child: ListView.builder(
+          itemCount: uiModule.drawerTitle.length,
+          itemBuilder: (context, i) {
+            return ListTile(
+                title: Text(uiModule.drawerTitle[i]),
+                onTap: () => uiModule.removeToCompos(
+                      context: context,
+                      page: uiModule.drawerCompos[i],
+                    ));
+          },
+        ),
+      ),
+    );
+  }
 
+  Column menu_body(LoginViewModel loginViewModel, BuildContext context, UiModules uiModule, BookedViewModel bookedViewModel) {
     return Column(
       children: [
         Text(
@@ -31,15 +56,14 @@ class MenuPage extends StatelessWidget {
               reselvationButton(
                 context,
                 dotenv.env["MAIN_PAGE_TITLE1"] ?? "",
-                () {},
+                () => uiModule.toCompos(context: context, page: const Calendar()),
               ),
               reselvationButton(
                   context,
                   dotenv.env["MAIN_PAGE_TITLE2"] ?? "",
                   () => {
-                        bookedViewModel.fare(),
                         bookedViewModel.getInfoFunc(user: bookedViewModel.user),
-                        () {},
+                        () => uiModule.toCompos(context: context, page: const ReservationConfirmationPage()),
                       }),
               reselvationButton(
                 context,
