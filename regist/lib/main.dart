@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:regist/membership_regist.dart';
 import 'package:regist/menu_page.dart';
 import 'package:regist/models/reservation_info_model.dart';
+import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
 
@@ -60,6 +61,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var uiModules = UiModules();
     return Scaffold(
       appBar: AppBar(
         title: Text(dotenv.env["TITLE"]!),
@@ -67,6 +69,17 @@ class HomePage extends StatelessWidget {
       body: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
         child: _buildBody(context),
+      ),
+      drawer: Drawer(
+        child: ListView.builder(
+          itemCount: uiModules.drawer.length,
+          itemBuilder: (context, i) {
+            return ListTile(
+              onTap: () => uiModules.drawerFunctions[i],
+              leading : ,
+            );
+          },
+        ),
       ),
     );
   }
