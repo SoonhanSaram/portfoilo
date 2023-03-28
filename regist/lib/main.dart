@@ -46,7 +46,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: dotenv.env["TITLE"]!,
-      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
+      theme: ThemeData(primarySwatch: Colors.blue),
       routes: {
         "/menu": (BuildContext context) => const MenuPage(),
       },

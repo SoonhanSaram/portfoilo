@@ -24,7 +24,7 @@ class DataRepository {
       await userReference.child("${reserInfo.user}$random").set(reserInfoMap);
     } catch (e) {}
   }
-
+  /**
   Future<List<ReserInfo>> getReserInfos({required user}) async {
     List<ReserInfo>? result = [];
 
@@ -39,7 +39,7 @@ class DataRepository {
       _database.ref().child("reservation_infos").orderByChild(user).get().then(
         (event) {
           final response = event.value;
-          // print(event.snapshot.children.length);
+          
           var datas =
               Map<String, dynamic>.from(response as Map<Object?, Object?>);
 
@@ -57,6 +57,7 @@ class DataRepository {
       throw Exception("데이터 호출 오류");
     }
   }
+   */
 
   // Future<List<ReserInfo>> getReserInfos({required user}) async {
   // List<ReserInfo>? result = [];

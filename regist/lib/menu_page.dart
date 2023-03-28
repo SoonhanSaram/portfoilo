@@ -66,8 +66,7 @@ class MenuPage extends StatelessWidget {
                   context,
                   dotenv.env["MAIN_PAGE_TITLE2"] ?? "",
                   () => {
-                        bookedViewModel.getInfoFunc(user: bookedViewModel.user),
-                        () => uiModule.toCompos(
+                        uiModule.toCompos(
                             context: context,
                             page: const ReservationConfirmationPage()),
                       }),
