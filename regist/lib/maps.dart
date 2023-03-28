@@ -11,6 +11,7 @@ import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:regist/models/directions_model.dart';
 import 'package:regist/result_page.dart';
+import 'package:regist/staticValue/static_value.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 
@@ -439,26 +440,13 @@ void _showBottomSheet(BuildContext context, BookedViewModel bookedViewModel) {
       return ConstrainedBox(
         constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.35, maxHeight: MediaQuery.of(context).size.height * 0.35),
         child: ListView.builder(
-          itemCount: 5,
+          itemCount: StaticValues.options.length + 1,
           itemBuilder: (context, i) {
-            var fee = [];
-            var titles = [];
-            fee.addAll(
-              [bookedViewModel.sedanRentFee, bookedViewModel.suvRentFee, bookedViewModel.limousineRentFee, "0000"],
-            );
-            titles.addAll(
-              [
-                dotenv.env["OPTION1"]!,
-                dotenv.env["OPTION2"]!,
-                dotenv.env["OPTION3"]!,
-                dotenv.env["OPTION4"]!,
-              ],
-            );
             if (i <= 3) {
               return ListTile(
                 onTap: () => {
-                  bookedViewModel.transport = titles[i],
-                  bookedViewModel.fee = fee[i],
+                  bookedViewModel.transport = StaticValues.options[i]["name"],
+                  bookedViewModel.fee = bookedViewModel.optionsFee[i],
                   toResult(context),
                 },
                 leading: const Icon(
@@ -466,11 +454,11 @@ void _showBottomSheet(BuildContext context, BookedViewModel bookedViewModel) {
                   size: 50,
                 ),
                 title: Text(
-                  titles[i],
+                  bookedViewModel.transport = StaticValues.options[i]["name"],
                   style: const TextStyle(fontSize: 24),
                 ),
                 trailing: Text(
-                  "${fee[i]}원",
+                  "${bookedViewModel.optionsFee[i]}원",
                   style: const TextStyle(fontSize: 24),
                 ),
               );

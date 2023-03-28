@@ -8,8 +8,7 @@ class StaticValues {
   static const String passwordTextField = "비밀번호를 입력해주세요";
   static const String emailTextField = "이메일을 입력해주세요";
   static const String googleScopeEmail = "email";
-  static const String googleScopeAddr =
-      "https://www.googleapis.com/auth/contacts.readonly";
+  static const String googleScopeAddr = "https://www.googleapis.com/auth/contacts.readonly";
   static const int backGroundColor = 0xFF2186D1;
   static const String mainPageTitle1 = '예약하러 가기';
   static const String mainPageTitle2 = "예약정보 확인";
@@ -23,17 +22,20 @@ class StaticValues {
   static const String mapSearchBox2 = "도착지를 입력해주세요";
   static const String warningMessage1 = "출발지를 입력해주세요";
   static const String warningMessage2 = "도착지를 입력해주세요";
-  static const String option1 = "승용차";
-  static const String option2 = "SUV";
-  static const String option3 = "리무진";
-  static const String option4 = "승합차";
+
   static const String cancel = "취소";
   static const String save = "확인";
-  static const String baseUrl =
-      "https://maps.googleapis.com/maps/api/directions/json?";
   static const String markerOrigin = "출발지";
   static const String markerDestination = "도착지";
-  static const double sedanRentFee = 30000;
-  static const double suvRentFee = 40000;
-  static const double limousineRentFee = 80000;
+  static const List<Map<String, dynamic>> rentFee = [
+    {"name": "SEDAN_RENT_FEE", "fee": 30000.0},
+    {"name": "SUV_RENT_FEE", "fee": 40000.0},
+    {"name": "LIMOUSINE_RENT_FEE", "fee": 80000.0},
+  ];
+  static const List<Map<String, dynamic>> options = [
+    {"name": "승용차"},
+    {"name": "SUV"},
+    {"name": "리무진"},
+    {"name": "승합차"}
+  ];
 }

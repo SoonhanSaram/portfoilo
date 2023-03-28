@@ -13,11 +13,10 @@ class _EmailRegistState extends State<EmailRegist> {
   final String _email = "";
   final String _password = "";
 
-  Future<void> _join() async {
+  void _join() async {
     Firebase.initializeApp();
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _email,
         password: _password,
       );
@@ -46,8 +45,7 @@ class _EmailRegistState extends State<EmailRegist> {
         child: Column(
           children: [
             registInput(state: _email),
-            registInput(
-                labelText: "비밀번호를 입력해주세요", obscureText: true, state: _password),
+            registInput(labelText: "비밀번호를 입력해주세요", obscureText: true, state: _password),
             TextButton(
                 onPressed: () {
                   _join();
@@ -60,10 +58,7 @@ class _EmailRegistState extends State<EmailRegist> {
     );
   }
 
-  Card registInput(
-      {String labelText = "사용 할 Email을 입력해주세요",
-      bool obscureText = false,
-      String state = ""}) {
+  Card registInput({String labelText = "사용 할 Email을 입력해주세요", bool obscureText = false, String state = ""}) {
     return Card(
       child: TextFormField(
           onChanged: (value) {

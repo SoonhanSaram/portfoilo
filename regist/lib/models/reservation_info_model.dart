@@ -5,13 +5,13 @@ class ReserInfo {
     this.stime = "",
     this.resDate = "",
     this.resTime = "",
+    this.edate = "",
+    this.etime = "",
     this.from = "",
     this.destination = "",
     this.transport = "",
     this.people = "",
     this.fee = "",
-    this.edate = "",
-    this.etime = "",
     this.status = 0,
   });
 
@@ -23,19 +23,18 @@ class ReserInfo {
   String from;
   String destination;
   String transport;
-  String people;
+  String? people;
   String fee;
-  String edate;
-  String etime;
+  String? edate;
+  String? etime;
   int status;
 
   // Firebase 에 입력하기 위한 직렬화(serialization)
-  Map<String, dynamic> toMapSave(
-      {required sdate, required stime, required status}) {
+  Map<String, dynamic> toMapSave({required sdate, required stime, required status}) {
     return {
       'user': user,
       'sdate': sdate,
-      'time': stime,
+      'stime': stime,
       'from': from,
       'destination': destination,
       'transport': transport,
@@ -43,22 +42,46 @@ class ReserInfo {
       'fee': fee,
       'edate': edate,
       'etime': etime,
+      'resTime': resTime,
+      'resDate': resDate,
       'status': status,
     };
   }
 
   factory ReserInfo.fromJson(Map<String, dynamic> json) {
     return ReserInfo(
-      user: json['user'],
-      sdate: json['sdate'],
-      edate: json['edate'],
-      stime: json['sdate'],
-      from: json['sdate'],
-      destination: json['sdate'],
-      transport: json['sdate'],
-      people: json['people'],
-      fee: json['fee'],
-      status: json['status'],
+      user: json['user'] ?? "정보 없음",
+      resDate: json['resDate'] ?? "정보 없음",
+      resTime: json['resTime'] ?? "정보 없음",
+      sdate: json['sdate'] ?? "정보 없음",
+      edate: json['edate'] ?? "정보 없음",
+      etime: json['etime'] ?? "정보 없음",
+      stime: json['stime'] ?? "정보 없음",
+      from: json['from'] ?? "정보 없음",
+      destination: json['destination'] ?? "정보 없음",
+      transport: json['transport'] ?? "정보 없음",
+      people: json['people'] ?? "정보 없음",
+      fee: json['fee'] ?? "0",
+      status: json['status'] ?? 0,
     );
+  }
+
+  @override
+  String toString() {
+    return '''
+      sdate: $sdate
+      fee: $fee
+      destination: $destination
+      stime: $stime
+      transport: $transport
+      edate: $edate
+      people: $people
+      resTime: $resTime
+      etime: $etime
+      from: $from
+      resDate: $resDate
+      user: $user
+      status: $status
+    ''';
   }
 }

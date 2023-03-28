@@ -6,17 +6,16 @@ import 'package:provider/provider.dart';
 import 'package:regist/membership_regist.dart';
 import 'package:regist/menu_page.dart';
 import 'package:regist/models/reservation_info_model.dart';
-import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
 
 void main() async {
   await dotenv.load(fileName: 'assets/config/.env');
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
   FirebaseDatabase database = FirebaseDatabase.instance;
   // await Future.delayed(const Duration(seconds: 3));
-  await Firebase.initializeApp();
+
   runApp(
     MultiProvider(
       providers: [
@@ -32,7 +31,7 @@ void main() async {
             bookedViewModel!.user = loginViewModel.reselInfo!.user;
             return bookedViewModel;
           },
-        )
+        ),
       ],
       child: const App(),
     ),
@@ -49,7 +48,7 @@ class App extends StatelessWidget {
       title: dotenv.env["TITLE"]!,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
       routes: {
-        "/menu": (BuildContext context) => const App(),
+        "/menu": (BuildContext context) => const MenuPage(),
       },
       home: const HomePage(),
     );
@@ -61,116 +60,107 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var uiModules = UiModules();
+    var loginViewModel = context.watch<LoginViewModel>();
+
+    if (loginViewModel.auth != null || loginViewModel.currentUser != null) {
+      return Scaffold(
+        body: ConstrainedBox(
+          constraints: const BoxConstraints.expand(),
+          child: const MenuPage(),
+        ),
+      );
+    } else if (loginViewModel.auth == null ||
+        loginViewModel.currentUser!.displayName == null) {}
     return Scaffold(
       appBar: AppBar(
         title: Text(dotenv.env["TITLE"]!),
       ),
       body: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
-        child: _buildBody(context),
-      ),
-      drawer: Drawer(
-        child: ListView.builder(
-          itemCount: uiModules.drawer.length,
-          itemBuilder: (context, i) {
-            return ListTile(
-              onTap: () => uiModules.drawerFunctions[i],
-              leading : ,
-            );
-          },
-        ),
+        child: _buildBody(context, loginViewModel),
       ),
     );
   }
 }
 
-_buildBody(BuildContext context) {
-  var loginViewModel = context.watch<LoginViewModel>();
-  var bookedViewModel = context.watch<BookedViewModel>();
-
-  if (loginViewModel.auth != null || loginViewModel.currentUser != null) {
-    return const MenuPage();
-  } else if (loginViewModel.auth == null ||
-      loginViewModel.currentUser?.displayName == null) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Flexible(
-          fit: FlexFit.loose,
-          flex: 2,
-          child: Text(
-            dotenv.env["PAGE_TITLE"]!,
-            style: const TextStyle(
-                fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
-          ),
+_buildBody(BuildContext context, LoginViewModel loginViewModel) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
+      Flexible(
+        fit: FlexFit.loose,
+        flex: 2,
+        child: Text(
+          dotenv.env["PAGE_TITLE"]!,
+          style: const TextStyle(
+              fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
         ),
-        Flexible(
-          fit: FlexFit.tight,
-          flex: 4,
-          child: Column(
-            children: [
-              inputBox(
-                  labelText: dotenv.env["EMAIL_TEXT_FIELD"]!,
-                  keyboardType: TextInputType.emailAddress,
-                  onChange: (value) => {
-                        loginViewModel.changeUpdateValue(
-                          dotenv.env["GOOGLE_SCOPE_EMAIL"]!,
-                          value,
-                        )
-                      }),
-              const SizedBox(
-                height: 20,
-              ),
-              inputBox(
-                  labelText: dotenv.env["PASSWORD_TEXT_FIELD"]!,
-                  obscureText: true,
-                  keyboardType: TextInputType.text,
-                  onChange: (value) => {
-                        loginViewModel.changeUpdateValue(
-                          dotenv.env["STATE_PASSWPRD"]!,
-                          value,
-                        )
-                      }),
-              TextButton(
-                  onPressed: () async {
-                    await loginViewModel.login(context);
-                  },
-                  child: Text(
-                    dotenv.env["LOGIN_BUTTON_TITLE"]!,
-                    style: const TextStyle(fontSize: 24),
-                  )),
-            ],
-          ),
+      ),
+      Flexible(
+        fit: FlexFit.tight,
+        flex: 4,
+        child: Column(
+          children: [
+            inputBox(
+                labelText: dotenv.env["EMAIL_TEXT_FIELD"]!,
+                keyboardType: TextInputType.emailAddress,
+                onChange: (value) => {
+                      loginViewModel.changeUpdateValue(
+                        dotenv.env["GOOGLE_SCOPE_EMAIL"]!,
+                        value,
+                      )
+                    }),
+            const SizedBox(
+              height: 20,
+            ),
+            inputBox(
+                labelText: dotenv.env["PASSWORD_TEXT_FIELD"]!,
+                obscureText: true,
+                keyboardType: TextInputType.text,
+                onChange: (value) => {
+                      loginViewModel.changeUpdateValue(
+                        dotenv.env["STATE_PASSWORD"]!,
+                        value,
+                      )
+                    }),
+            TextButton(
+                onPressed: () async {
+                  await loginViewModel.login(context);
+                },
+                child: Text(
+                  dotenv.env["LOGIN_BUTTON_TITLE"]!,
+                  style: const TextStyle(fontSize: 24),
+                )),
+          ],
         ),
+      ),
 
-        /**
+      /**
              * Flexible
              * 내부에 있는 widget 이 화면을 벗어나려고 할 때,
              * fit 속성을 Flexible.tight 로 설정하면
              * 화면 범위내에서 화면에 남은 영역만 차지하도록
              * 내부 화면 범위를 제한
              */
-        Flexible(
-            flex: 2,
-            fit: FlexFit.loose,
-            child: Column(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const EmailRegist()));
-                  },
-                  child: Text(dotenv.env["JOIN_BUTTON_TITLE"]!),
-                ),
-                loginButton(loginViewModel, context),
-              ],
-            )),
-      ],
-    );
-  }
+      Flexible(
+          flex: 2,
+          fit: FlexFit.loose,
+          child: Column(
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const EmailRegist()));
+                },
+                child: Text(dotenv.env["JOIN_BUTTON_TITLE"]!),
+              ),
+              loginButton(loginViewModel, context),
+            ],
+          )),
+    ],
+  );
 }
 
 GestureDetector loginButton(

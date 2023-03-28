@@ -51,6 +51,7 @@ class ResultPage extends StatelessWidget {
                               TextButton(
                                 onPressed: () {
                                   bookedViewModel.infoSaveFunc(bookedViewModel.reserInfomation!);
+                                  print(bookedViewModel.reserInfomation);
                                   Navigator.pushNamedAndRemoveUntil(context, "/menu", (route) => false);
                                 },
                                 child: const Text("완료"),
