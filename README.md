@@ -35,3 +35,12 @@
 
 - android Studio\jre\bin 에서
   `./keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore -storepass android keypass android | openssl sha1 -binary | openssl base64 `
+
+
+## react-remix 로 관리자 웹 페이지 빌드하기
+
+## 서버 사이드 렌더링 (SSR)을 하는 이유
+
+- 사용자 경험 개선 (사용자의 대기 시간 절감)
+- 검색 엔진 최적화 
+- 정적 페이지 및 캐싱
