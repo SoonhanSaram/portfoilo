@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:regist/maps.dart';
-import 'package:regist/menu_page.dart';
-import 'package:regist/reservation_confirmation_page.dart';
+import 'package:regist/app_view/maps.dart';
+import 'package:regist/app_view/menu_page.dart';
+import 'package:regist/app_view/reservation_confirmation_page.dart';
 
 class UiModules {
   Future<void> removeToCompos({required context, required Widget page}) async {
@@ -32,7 +32,8 @@ class UiModules {
     const MenuPage(),
   ];
 
-  Future<void> toCompos({required BuildContext context, required Widget page}) async {
+  Future<void> toCompos(
+      {required BuildContext context, required Widget page}) async {
     if (!Navigator.canPop(context)) {
       Navigator.push(
         context,
@@ -42,6 +43,21 @@ class UiModules {
           },
         ),
       );
+    }
+  }
+
+  void replaceToCompos({required BuildContext context, required Widget page}) {
+    try {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return page;
+          },
+        ),
+      );
+    } catch (e) {
+      throw Exception("이동 함수 에러");
     }
   }
 

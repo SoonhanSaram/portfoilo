@@ -27,12 +27,15 @@ class BookedViewModel with ChangeNotifier {
   // 출발지와 목적지 거리 계산 함수
   double distance({lat1, lon1, lat2, lon2}) {
     var p = 0.017453292519943295;
-    var a = 0.5 - cos((lat2 - lat1) * p) / 2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+    var a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
   }
 
   // 경로 검색 repository 로 보내는 함수
-  Future<void> fetchDirections({required LatLng origin, required LatLng destination}) async {
+  Future<void> fetchDirections(
+      {required LatLng origin, required LatLng destination}) async {
     try {
       _directions = await _repository.getDirections(
         origin: origin,
@@ -90,17 +93,45 @@ class BookedViewModel with ChangeNotifier {
     }
   }
 
-  Future<List<ReserInfo>> getInfoFunc({required user}) async {
-    List<ReserInfo> result = [];
-
+  Future<void> infoUpdateFunc(String key, ReserInfo value) async {
     try {
-      var response = await _dataRepository.getReserInfos(user: user);
-      print("중계함수 $response");
-      return result;
+      await _dataRepository.updateInfos(key, value);
     } catch (e) {
-      throw Exception("중계 함수 에러");
+      throw Exception("중계함수 에러");
     }
   }
+
+  // 예약확인 창에서 사용할 정보 제거 함수
+  void resetReserInfoWithoutUser() {
+    _reserInfo = ReserInfo(
+      user: _reserInfo!.user, // 유저 정보는 그대로 유지
+      resDate: '',
+      resTime: '',
+      sdate: "",
+      stime: "",
+      edate: "",
+      etime: "",
+      people: "",
+      transport: "",
+      from: '',
+      destination: '',
+      fee: "",
+      status: 0,
+    );
+    notifyListeners();
+  }
+  // 중계함수
+  // Future<List<ReserInfo>> getInfoFunc({required user}) async {
+  // List<ReserInfo> result = [];
+//
+  // try {
+  // var response = await _dataRepository.getReserInfos(user: user);
+  // print("중계함수 $response");
+  // return result;
+  // } catch (e) {
+  // throw Exception("중계 함수 에러");
+  // }
+  // }
 
   ReserInfo? get reserInfomation => _reserInfo;
 
@@ -192,4 +223,11 @@ class BookedViewModel with ChangeNotifier {
     _reserInfo!.etime = etime;
     notifyListeners();
   }
+
+  set status(int status) {
+    _reserInfo!.status = status;
+    notifyListeners();
+  }
+
+  int get status => _reserInfo!.status;
 }

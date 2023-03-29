@@ -3,8 +3,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:regist/membership_regist.dart';
-import 'package:regist/menu_page.dart';
+import 'package:regist/app_view/membership_regist.dart';
+import 'package:regist/app_view/menu_page.dart';
+
 import 'package:regist/models/reservation_info_model.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
@@ -46,7 +47,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: dotenv.env["TITLE"]!,
-      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Notosans"),
+      theme: ThemeData(primarySwatch: Colors.blue),
       routes: {
         "/menu": (BuildContext context) => const MenuPage(),
       },
@@ -69,7 +70,8 @@ class HomePage extends StatelessWidget {
           child: const MenuPage(),
         ),
       );
-    } else if (loginViewModel.auth == null || loginViewModel.currentUser!.displayName == null) {}
+    } else if (loginViewModel.auth == null ||
+        loginViewModel.currentUser!.displayName == null) {}
     return Scaffold(
       appBar: AppBar(
         title: Text(dotenv.env["TITLE"]!),
@@ -91,7 +93,8 @@ _buildBody(BuildContext context, LoginViewModel loginViewModel) {
         flex: 2,
         child: Text(
           dotenv.env["PAGE_TITLE"]!,
-          style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
+          style: const TextStyle(
+              fontSize: 36, fontWeight: FontWeight.w600, color: Colors.blue),
         ),
       ),
       Flexible(
@@ -147,7 +150,10 @@ _buildBody(BuildContext context, LoginViewModel loginViewModel) {
             children: [
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const EmailRegist()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const EmailRegist()));
                 },
                 child: Text(dotenv.env["JOIN_BUTTON_TITLE"]!),
               ),
@@ -158,7 +164,8 @@ _buildBody(BuildContext context, LoginViewModel loginViewModel) {
   );
 }
 
-GestureDetector loginButton(LoginViewModel loginViewModel, BuildContext context) {
+GestureDetector loginButton(
+    LoginViewModel loginViewModel, BuildContext context) {
   return GestureDetector(
     onTap: () async {
       try {
@@ -226,6 +233,8 @@ TextFormField inputBox({
     keyboardType: keyboardType,
     onChanged: onChange,
     obscureText: obscureText,
-    decoration: InputDecoration(labelText: labelText, labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 }

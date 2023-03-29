@@ -30,7 +30,8 @@ class ReserInfo {
   int status;
 
   // Firebase 에 입력하기 위한 직렬화(serialization)
-  Map<String, dynamic> toMapSave({required sdate, required stime, required status}) {
+  Map<String, dynamic> toMapSave(
+      {required sdate, required stime, required status}) {
     return {
       'user': user,
       'sdate': sdate,
@@ -45,6 +46,26 @@ class ReserInfo {
       'resTime': resTime,
       'resDate': resDate,
       'status': status,
+    };
+  }
+
+  Map<String, dynamic> toMap(ReserInfo value) {
+    print("실행중");
+
+    return {
+      "user": value.user,
+      "sdate": value.sdate,
+      "stime": value.stime,
+      "resDate": value.resDate,
+      "resTime": value.resTime,
+      "edate": value.edate ?? "",
+      "etime": value.etime ?? "",
+      "from": value.from,
+      "destination": value.destination,
+      "transport": value.transport,
+      "people": value.people ?? "",
+      "fee": value.fee,
+      "status": value.status,
     };
   }
 
