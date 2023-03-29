@@ -24,6 +24,18 @@ class DataRepository {
       await userReference.child("${reserInfo.user}$random").set(reserInfoMap);
     } catch (e) {}
   }
+
+  Future<void> updateInfos(String key, ReserInfo value) async {
+    try {
+      await _database
+          .ref()
+          .child("reservation_infos")
+          .child(key)
+          .update(value.toMap(value));
+    } catch (e) {
+      throw Exception("데이터 수정 에러");
+    }
+  }
   /**
   Future<List<ReserInfo>> getReserInfos({required user}) async {
     List<ReserInfo>? result = [];

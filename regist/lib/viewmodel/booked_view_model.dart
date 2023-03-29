@@ -92,6 +92,34 @@ class BookedViewModel with ChangeNotifier {
       throw Exception();
     }
   }
+
+  Future<void> infoUpdateFunc(String key, ReserInfo value) async {
+    try {
+      await _dataRepository.updateInfos(key, value);
+    } catch (e) {
+      throw Exception("중계함수 에러");
+    }
+  }
+
+  // 예약확인 창에서 사용할 정보 제거 함수
+  void resetReserInfoWithoutUser() {
+    _reserInfo = ReserInfo(
+      user: _reserInfo!.user, // 유저 정보는 그대로 유지
+      resDate: '',
+      resTime: '',
+      sdate: "",
+      stime: "",
+      edate: "",
+      etime: "",
+      people: "",
+      transport: "",
+      from: '',
+      destination: '',
+      fee: "",
+      status: 0,
+    );
+    notifyListeners();
+  }
   // 중계함수
   // Future<List<ReserInfo>> getInfoFunc({required user}) async {
   // List<ReserInfo> result = [];
@@ -195,4 +223,11 @@ class BookedViewModel with ChangeNotifier {
     _reserInfo!.etime = etime;
     notifyListeners();
   }
+
+  set status(int status) {
+    _reserInfo!.status = status;
+    notifyListeners();
+  }
+
+  int get status => _reserInfo!.status;
 }

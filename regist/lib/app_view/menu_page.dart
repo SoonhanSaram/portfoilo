@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:regist/calendar.dart';
-import 'package:regist/reservation_confirmation_page.dart';
+import 'package:regist/app_view/calendar.dart';
+import 'package:regist/app_view/reservation_confirmation_page.dart';
+
 import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';

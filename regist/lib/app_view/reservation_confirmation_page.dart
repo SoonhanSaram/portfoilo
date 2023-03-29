@@ -1,8 +1,10 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:regist/app_view/result_page.dart';
 import 'package:regist/models/reservation_info_model.dart';
-import 'package:regist/result_page.dart';
+
+import 'package:regist/ui_modules/pop_up.dart';
 import 'package:regist/ui_modules/ui_modules.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
@@ -19,9 +21,12 @@ class _ReservationConfirmationPageState
     extends State<ReservationConfirmationPage> {
   // Set<type> 중복된 값을 버리고 추가
   final List<ReserInfo> _list = [];
+  final List<Map<String, dynamic>> _itemList = [];
   final _database = FirebaseDatabase.instance.ref();
+  final uiModules = UiModules();
   late String _user;
   late BookedViewModel _bookedViewModel;
+
   Future<void> getDocs(String user) async {
     _database.child('reservation_infos').orderByChild(user).onValue.listen(
       (event) {
@@ -35,8 +40,10 @@ class _ReservationConfirmationPageState
         final result = <String, dynamic>{};
         for (var key in keys) {
           var value = ReserInfo.fromJson(Map<String, dynamic>.from(datas[key]));
+          Map<String, dynamic> response = {key: value};
           setState(() {
             _list.add(value);
+            _itemList.add(response);
           });
         }
       },
@@ -73,6 +80,8 @@ class _ReservationConfirmationPageState
                 return infoCard(i, Colors.tealAccent, Colors.black);
               } else if (_list[i].status == 2) {
                 return infoCard(i, Colors.blueAccent, Colors.white);
+              } else if (_list[i].status == 3) {
+                return infoCard(i, Colors.redAccent, Colors.white);
               }
               return infoCard(i, Colors.deepPurpleAccent, Colors.grey);
             }),
@@ -95,10 +104,15 @@ class _ReservationConfirmationPageState
 
   GestureDetector infoCard(int i, MaterialAccentColor color, Color textColor) {
     return GestureDetector(
+      onLongPress: () {
+        var temp = _itemList[i];
+        showPopup(
+            context: context, bookedViewModel: _bookedViewModel, temp: temp);
+      },
       onTap: () {
-        print("클릭");
-
-        UiModules().toCompos(
+        ReserInfo temp = _list[i];
+        _bookedViewModel.reserInfo = temp;
+        uiModules.replaceToCompos(
           context: context,
           page: const ResultPage(),
         );

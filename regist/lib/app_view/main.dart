@@ -3,8 +3,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:regist/membership_regist.dart';
-import 'package:regist/menu_page.dart';
+import 'package:regist/app_view/membership_regist.dart';
+import 'package:regist/app_view/menu_page.dart';
+
 import 'package:regist/models/reservation_info_model.dart';
 import 'package:regist/viewmodel/booked_view_model.dart';
 import 'package:regist/viewmodel/login_view_model.dart';
