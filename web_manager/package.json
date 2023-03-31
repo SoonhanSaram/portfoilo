@@ -12,9 +12,8 @@
     "@remix-run/react": "^1.14.3",
     "@remix-run/serve": "^1.14.3",
     "firebase": "^9.18.0",
-    "fs": "^0.0.1-security",
+    "firebase-admin": "^11.5.0",
     "isbot": "^3.6.5",
-    "path": "^0.12.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
