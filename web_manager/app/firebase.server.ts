@@ -6,7 +6,7 @@ let auth: Auth;
 
 if (getApps().length === 0) {
   app = initializeApp({
-    credential: cert(require("")),
+    credential: cert(require("../kyoungmin-b211b-firebase-adminsdk-qs3a9-ca5f1a9e86.json")),
   });
   auth = getAuth(app);
 } else {
