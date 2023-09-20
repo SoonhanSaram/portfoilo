@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ui/custom_text_field.dart';
+import 'package:flutter_ui/widget/customContainer.dart';
+import 'package:flutter_ui/widget/customFloatingButton.dart';
+import 'package:flutter_ui/widget/customTextField.dart';
 
 void main() => runApp(
       MaterialApp(
@@ -17,33 +20,10 @@ class CustomWidget extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: CustomContainer(height: 0.4, width: 0.5, color: const Color.fromRGBO(233, 233, 233, 1)),
+          child: customFloatingButton(),
         ),
       ),
-    );
-  }
-}
-
-class CustomContainer extends StatelessWidget {
-  CustomContainer({super.key, this.child, this.height = 1.0, this.width = 1.0, this.color = const Color.fromRGBO(0, 0, 0, 0.7)});
-  Color color;
-  double height;
-  double width;
-  Widget? child;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(
-          width: 2.0,
-          color: color,
-        ),
-      ),
-      width: MediaQuery.of(context).size.width * width,
-      height: MediaQuery.of(context).size.height * height,
-      child: child,
+      floatingActionButton: customFloatingButton(),
     );
   }
 }
@@ -115,7 +95,11 @@ class ReplayWidget extends StatelessWidget {
 }
 
 class ReReply extends StatelessWidget {
-  ReReply({super.key, required List<Map<String, dynamic>> replySample, required this.index}) : _replySample = replySample;
+  ReReply(
+      {super.key,
+      required List<Map<String, dynamic>> replySample,
+      required this.index})
+      : _replySample = replySample;
 
   final List<Map<String, dynamic>> _replySample;
   int index;
@@ -141,7 +125,11 @@ class ReReply extends StatelessWidget {
 }
 
 class OriginalReply extends StatelessWidget {
-  OriginalReply({super.key, required List<Map<String, dynamic>> replySample, required this.index}) : _replySample = replySample;
+  OriginalReply(
+      {super.key,
+      required List<Map<String, dynamic>> replySample,
+      required this.index})
+      : _replySample = replySample;
 
   final List<Map<String, dynamic>> _replySample;
   int index;

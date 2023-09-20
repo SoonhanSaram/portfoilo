@@ -1,9 +1,0 @@
-caps-lock-on {
-    font-weight: 900;
-    color : red
-}
-
-caps-lock-off {
-    color : black;
-    background-color: azure;
-}
